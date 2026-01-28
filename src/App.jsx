@@ -1,7 +1,7 @@
 export default function App() {
   return (
     <div>
-      <h1>React</h1>
+      <h1>TokyoDisasterRiskVisualizationApp</h1>
     </div>
   );
 }
