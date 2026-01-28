@@ -2,6 +2,7 @@ import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import { useAtom } from "jotai";
 import { mapCenterAtom, mapZoomAtom } from "../atoms/mapAtom";
 import { useRef } from "react";
+import { fetchEarthquakeLayer } from "../api/earthquakeApi";
 
 /**------------------------------------------------------------------
  * GoogleMapを表示し、ユーザー操作(移動･ズーム)をjotaiのatomに同期させる
@@ -38,7 +39,57 @@ export default function MapContainer() {
       // mapインスタンスを保持(初期化した瞬間呼ばれる)
       // map=GoogleMapsAPIのMapオブジェクト
       // ⇒mapRef.current.getCenter(); , mapRef.current.getZoom(); が利用可能に
-      onLoad={(map) => (mapRef.current = map)}
+      onLoad={(map) => {
+        mapRef.current = map;
+      }}
+      // ここから新規
+      onIdle={async () => {
+        if (!mapRef.current) return;
+
+        const c = mapRef.current.getCenter();
+        const z = mapRef.current.getZoom();
+        const bounds = mapRef.current.getBounds();
+
+        if (!c || z == null || !bounds) return;
+
+        // atom更新(Map中心･ズーム管理)
+        setCenter({ lat: c.lat(), lng: c.lng() });
+        setZoom(z);
+
+        // bounds ⇒ min/max
+        const ne = bounds.getNorthEast();
+        const sw = bounds.getSouthWest();
+
+        const minLat = sw.lat();
+        const maxLat = ne.lat();
+        const minLng = sw.lng();
+        const maxLng = ne.lng();
+
+        console.log("map state:", {
+          center: { lat: c.lat(), lng: c.lng() },
+          zoom: z,
+          minLat,
+          maxLat,
+          minLng,
+          maxLng
+        });
+
+        // APIの疎通確認
+        const data = await fetchEarthquakeLayer(
+          minLat,
+          maxLat,
+          minLng,
+          maxLng,
+          z
+        );
+
+        console.log("earthquake layer response:", data);
+      }}
+    />
+  );
+}
+
+/*
       // 地図移動を検知した場合：
       onCenterChanged={() => {
         // mapインスタンスから中心を取得
@@ -61,3 +112,4 @@ export default function MapContainer() {
     />
   );
 }
+*/

@@ -10,7 +10,7 @@ export const fetchEarthquakeLayer = async (
   maxLng: number,
   zoom: number
 ) => {
-  console.log("API params:", {
+  console.log("API request params:", {
     minLat,
     maxLat,
     minLng,
