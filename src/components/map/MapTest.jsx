@@ -1,5 +1,8 @@
 import { GoogleMap, LoadScript } from "@react-google-maps/api";
 
+/**-------------------------------------------------
+ * MAPVIEW表示テスト用（実装しない）
+ -------------------------------------------------*/
 const containerStyle = {
   width: "100%",
   height: "400px"
