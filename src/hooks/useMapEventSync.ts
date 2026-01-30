@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { mapCenterAtom, mapZoomAtom } from "../atoms/mapAtom";
 import { mapBoundsAtom } from "../atoms/mapBoundsAtom";
-import { RefObject } from "react";
+import { RefObject, useCallback } from "react";
 
 /**---------------------------------------------
  * Mapのイベントをstateに反映するカスタムフック
@@ -16,13 +16,13 @@ type UseMapEventSyncProps = {
   mapRef: RefObject<google.maps.Map | null>;
 };
 
-export default function MapEventSync({ mapRef }: UseMapEventSyncProps) {
+export default function useMapEventSync({ mapRef }: UseMapEventSyncProps) {
   const [, setCenter] = useAtom(mapCenterAtom);
   const [, setZoom] = useAtom(mapZoomAtom);
   const [, setBounds] = useAtom(mapBoundsAtom);
 
   // onIdle=今の地図状態が確定した瞬間に呼ばれる
-  const onIdle = () => {
+  const onIdle = useCallback(() => {
     // mapが無ければ何もしない
     if (!mapRef.current) return;
 
@@ -43,15 +43,11 @@ export default function MapEventSync({ mapRef }: UseMapEventSyncProps) {
     };
 
     // Map中央値セット
-    setCenter((prev) => {
-      // 前回と同じなら同じ参照を返す
-      if (!prev) return nextCenter;
-
-      // 変わった時だけ更新
-      return prev.lat === nextCenter.lat && prev.lng === nextCenter.lng
-        ? prev
-        : nextCenter;
-    });
+    setCenter((prev) =>
+      !prev || prev.lat !== nextCenter.lat || prev.lng !== nextCenter.lng
+        ? nextCenter
+        : prev
+    );
 
     // zoom値セット、差分チェック(値が同じなら更新しない)
     setZoom((prev) => (prev === zoom ? prev : zoom));
@@ -73,15 +69,14 @@ export default function MapEventSync({ mapRef }: UseMapEventSyncProps) {
       if (!prev) return nextBounds;
 
       // 前回と同様なら同じ参照を返す
-      const same =
-        prev.minLat === nextBounds.minLat &&
+      return prev.minLat === nextBounds.minLat &&
         prev.maxLat === nextBounds.maxLat &&
         prev.minLng === nextBounds.minLng &&
-        prev.maxLng === nextBounds.maxLng;
-
-      return same ? prev : nextBounds;
+        prev.maxLng === nextBounds.maxLng
+        ? prev
+        : nextBounds;
     });
-  };
+  }, [mapRef, setCenter, setZoom, setBounds]);
 
   // GoogleMapに渡すイベントハンドラ
   return { onIdle };

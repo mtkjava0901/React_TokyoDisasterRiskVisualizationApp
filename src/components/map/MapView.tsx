@@ -1,5 +1,8 @@
-import { GoogleMap } from "@react-google-maps/api";
+import { GoogleMap, Polygon } from "@react-google-maps/api";
+import { useAtom } from "jotai";
 import { ReactNode } from "react";
+import { mapBoundsAtom } from "../../atoms/mapBoundsAtom";
+import { activeLayerAtom } from "../../atoms/activeLayerAtom";
 
 /**------------------------------------------------------------------
  * GoogleMapコンポーネント
@@ -9,11 +12,8 @@ import { ReactNode } from "react";
  ------------------------------------------------------------------*/
 // props用の型を定義
 type MapViewProps = {
-  // 地図の中心座標(=atom由来)
-  center: {
-    lat: number;
-    lng: number;
-  };
+  // 地図の中心座標
+  center: { lat: number; lng: number };
   // 現在のズームレベル(=atom由来)
   zoom: number;
   // GoogleMapが初期化された瞬間に呼ばれる(保持しない)
@@ -31,17 +31,33 @@ export default function MapView({
   onIdle,
   children
 }: MapViewProps) {
+  const [bounds] = useAtom(mapBoundsAtom);
+  const [activeLayer] = useAtom(activeLayerAtom);
+
   return (
     <GoogleMap
-      // 地図を表示するDOMサイズの指定
       mapContainerStyle={{ width: "100%", height: "400px" }}
-      // center/zoomの指定 (atomをそのまま渡す)
       center={center}
       zoom={zoom}
-      // イベントは全て外へ委譲する(onLoad/onIdle)
       onLoad={onLoad}
       onIdle={onIdle}
     >
+      {/* 安定化ガード(必須) */}
+      {bounds && activeLayer === "earthquake" && (
+        <Polygon
+          paths={[
+            { lat: 35.68, lng: 139.76 },
+            { lat: 35.69, lng: 139.76 },
+            { lat: 35.69, lng: 139.77 }
+          ]}
+          options={{
+            fillColor: "red",
+            fillOpacity: 0.4,
+            strokeColor: "red",
+            strokeWeight: 2
+          }}
+        />
+      )}
       {children}
     </GoogleMap>
   );
