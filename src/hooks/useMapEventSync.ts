@@ -9,6 +9,8 @@ import { RefObject, useCallback } from "react";
  * ・onBoundsChanged
  * ・onZoomChanged
  * 「Map ⇒ atom」の一方向同期
+ * -GoogleMapの「事実」をatomに流すだけ
+ * -解釈(zoom→MeshLevel等)は一切しない
 --------------------------------------------- */
 // props用の型を定義
 type UseMapEventSyncProps = {
@@ -34,7 +36,9 @@ export default function useMapEventSync({ mapRef }: UseMapEventSyncProps) {
 
     // 取得失敗時のガード
     // getCenterがnull/getZoomがundefined(未定義)/bounds(境界)未確定
-    if (!center || zoom == null || !bounds) return;
+    if (!center) return;
+    if (zoom == null) return;
+    if (!bounds) return;
 
     // centerをatomに反映(差分チェック付き)
     const nextCenter = {

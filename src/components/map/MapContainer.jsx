@@ -5,7 +5,7 @@ import { useRef } from "react";
 import MapView from "./MapView";
 import MapEventSync from "../../hooks/useMapEventSync";
 import EarthquakeDataController from "../controller/EarthquakeDataController";
-import EarthquakePolygonLayer from "./layers/EarthquakePolygonLayer";
+import EarthquakePolygonLayer from "./layers/earthquake/EarthquakePolygonLayer";
 
 /**------------------------------------------------------------------
  * GoogleMapを表示し、ユーザー操作(移動･ズーム)をjotaiのatomに同期させる
@@ -16,6 +16,7 @@ const LIBRARIES = ["geometry"];
 export default function MapContainer() {
   // atomからstateを取得
   const [center] = useAtom(mapCenterAtom);
+  //const center = { lat: 35.854, lng: 139.156 };
   const [zoom] = useAtom(mapZoomAtom);
 
   // mapインスタンスをrefに保存
@@ -42,8 +43,10 @@ export default function MapContainer() {
         zoom={zoom}
         onLoad={(map) => (mapRef.current = map)}
         {...mapEvents} // onIdleをここで渡す
-      />
-      {/* <EarthquakePolygonLayer /> */}
+      >
+        <EarthquakePolygonLayer />
+      </MapView>
+
       <EarthquakeDataController />
     </>
   );

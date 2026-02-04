@@ -1,9 +1,5 @@
 import { GoogleMap, Polygon } from "@react-google-maps/api";
-import { useAtom } from "jotai";
 import { ReactNode } from "react";
-import { mapBoundsAtom } from "../../atoms/mapBoundsAtom";
-import { activeLayerAtom } from "../../atoms/activeLayerAtom";
-
 /**------------------------------------------------------------------
  * GoogleMapコンポーネント
  * (Marker / Polygon / Overlayの描画)
@@ -31,8 +27,7 @@ export default function MapView({
   onIdle,
   children
 }: MapViewProps) {
-  const [bounds] = useAtom(mapBoundsAtom);
-  const [activeLayer] = useAtom(activeLayerAtom);
+  console.log("MapView children:", children);
 
   return (
     <GoogleMap
@@ -42,22 +37,6 @@ export default function MapView({
       onLoad={onLoad}
       onIdle={onIdle}
     >
-      {/* 安定化ガード(必須) */}
-      {bounds && activeLayer === "earthquake" && (
-        <Polygon
-          paths={[
-            { lat: 35.68, lng: 139.76 },
-            { lat: 35.69, lng: 139.76 },
-            { lat: 35.69, lng: 139.77 }
-          ]}
-          options={{
-            fillColor: "red",
-            fillOpacity: 0.4,
-            strokeColor: "red",
-            strokeWeight: 2
-          }}
-        />
-      )}
       {children}
     </GoogleMap>
   );
