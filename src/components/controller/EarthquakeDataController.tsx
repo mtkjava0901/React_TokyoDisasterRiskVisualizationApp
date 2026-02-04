@@ -40,15 +40,27 @@ export default function EarthquakeDataController() {
   useEffect(() => {
     // bounds(境界)が無い場合はそのまま返す
     if (!bounds) return;
+
     // earthquakeレイヤー以外では動かない
-    if (activeLayer !== "earthquake") return;
+    if (activeLayer !== "earthquake") {
+      setEarthquakes([]);
+      return;
+    }
 
     // ズーム値の解釈
     const rule = resolveZoomRule(zoom);
-    if (!rule.fetchable) return;
+    // fetch不可
+    if (!rule.fetchable) {
+      setEarthquakes([]);
+      return;
+    }
 
     const meshValue = meshLevelValueMap[rule.meshLevel];
-    if (!meshValue) return;
+    // meshなし = 表示無し
+    if (meshValue === null) {
+      setEarthquakes([]);
+      return;
+    }
 
     /**-------------------------------------------------
      * 現在の地図範囲・ズームを使い、地震データAPIを呼び出す

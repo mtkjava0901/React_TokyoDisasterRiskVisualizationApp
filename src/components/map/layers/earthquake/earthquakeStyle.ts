@@ -7,10 +7,11 @@ import { EarthquakeRiskLevel } from "../../../../types/Earthquake";
  ----------------------------------------------*/
 
 export type PolygonStyle = {
-  fillColor: string;
-  fillOpacity: number;
-  strokeColor: string;
-  strokeWeight: number;
+  fillColor: string; // 塗りつぶし色
+  fillOpacity: number; // 塗りつぶしの不透明度
+  strokeColor: string; // 輪郭色
+  strokeOpacity: number; // 輪郭の不透明度
+  strokeWeight: number; // 輪郭の太さ
 };
 
 export const earthquakePolygonStyleMap: Record<
@@ -18,21 +19,24 @@ export const earthquakePolygonStyleMap: Record<
   PolygonStyle
 > = {
   HIGH: {
-    fillColor: "#ff0000",
+    fillColor: "#FF0000",
     fillOpacity: 0.5,
-    strokeColor: "#aa0000",
-    strokeWeight: 2
+    strokeColor: "#AA0000",
+    strokeOpacity: 0.7,
+    strokeWeight: 1
   },
-  MIDEUM: {
-    fillColor: "#ffa500",
-    fillOpacity: 0.5,
-    strokeColor: "#cc8400",
-    strokeWeight: 2
+  MEDIUM: {
+    fillColor: "#FF9900",
+    fillOpacity: 0.4,
+    strokeColor: "#AA6600",
+    strokeOpacity: 0.6,
+    strokeWeight: 1
   },
   LOW: {
-    fillColor: "#ffff00",
-    fillOpacity: 0.5,
-    strokeColor: "#cccc00",
-    strokeWeight: 2
+    fillColor: "#FFFF00",
+    fillOpacity: 0.03,
+    strokeColor: "#AAAA00",
+    strokeOpacity: 0.5,
+    strokeWeight: 1
   }
 };

@@ -14,9 +14,9 @@ import { activeLayerAtom } from "../../../../atoms/activeLayerAtom";
  * ・描画だけに集中
  * ・再レンダリング最小化
  ---------------------------------------------*/
-// 最小描画ズーム値
-const MIN_RENDER_ZOOM = 7;
-// 最大描画ズーム値
+// zoom9未満では地震レイヤーは非表示
+const DETAIL_RENDER_ZOOM = 9;
+// 最大描画zoom(14以上非表示)
 const MAX_RENDER_ZOOM = 13;
 // 描画上限設定（パフォーマンスガード）
 const MAX_POLYGON_COUNT = 3000;
@@ -25,11 +25,13 @@ function EarthquakePolygonLayer() {
   const earthquakes = useAtomValue(earthquakeDataAtom);
   // console.log("earthquakes:", earthquakes.length);
   const zoom = useAtomValue(mapZoomAtom);
+  console.log("[EarthquakePolygonLayer] zoom =", zoom);
   const bounds = useAtomValue(mapBoundsAtom);
-  console.log("bounds:", bounds);
+  // console.log("bounds:", bounds);
   const activeLayer = useAtomValue(activeLayerAtom);
   // console.log("activeLayer:", activeLayer);
 
+  /*
   console.log(
     "[EarthquakePolygonLayer]",
     "zoom=",
@@ -39,31 +41,23 @@ function EarthquakePolygonLayer() {
     "activeLayer=",
     activeLayer
   );
+  */
 
-  // Polygon一覧をメモ化（earthquakesが変わらない限り再生成しない）
+  /**---------------------------------------------
+    * Polygon一覧をメモ化
+    * （earthquakesが変わらない限り再生成しない）
+   ---------------------------------------------*/
   const polygons = useMemo(() => {
-    console.log("[useMemo] start");
-
-    if (activeLayer !== "earthquake") {
-      // console.log("[useMemo] inactive layer", activeLayer);
-      return null;
-    }
-
+    // レイヤー非アクティブの場合(入口ガード)
+    if (activeLayer !== "earthquake") return null;
     if (!bounds) return null;
 
-    // zoomガード(条件外なら描画しない)
-    if (zoom < MIN_RENDER_ZOOM || zoom > MAX_RENDER_ZOOM) {
-      // console.log("[useMemo] zoom out of range", zoom);
-      return null;
-    }
+    // zoomガード
+    if (zoom < DETAIL_RENDER_ZOOM || zoom > MAX_RENDER_ZOOM) return null;
+    if (earthquakes.length === 0) return null;
 
-    if (earthquakes.length === 0) {
-      //console.log("[Polygon sample]", earthquakes[0].polygon);
-      return null;
-    }
-
-    // 0204
-    const filteredEarthquakes = earthquakes.filter((eq) =>
+    // 表示範囲に含まれるポリゴンのみ抽出
+    const filtered = earthquakes.filter((eq) =>
       eq.polygon.some(
         (p) =>
           p.lat >= bounds.minLat &&
@@ -73,54 +67,23 @@ function EarthquakePolygonLayer() {
       )
     );
 
-    console.log(
-      "[filtered polygons]",
-      filteredEarthquakes.length,
-      "/",
-      earthquakes.length
-    );
-
-    if (filteredEarthquakes.length > MAX_POLYGON_COUNT) {
+    if (filtered.length > MAX_POLYGON_COUNT) {
       console.warn(
-        `[EarthquakePolygonLayer] polygon count over limit: ${filteredEarthquakes.length}`
+        `[EarthquakePolygonLayer] polygon const over limit: ${filtered.length}`
       );
       return null;
     }
 
-    // console.log("[useMemo] render polygons", earthquakes.length);
-
-    // 0204
-    // console.log(
-    //   "[Polygon point sample]",
-    //   earthquakes[0].polygon[0],
-    //   typeof earthquakes[0].polygon[0].lat,
-    //   typeof earthquakes[0].polygon[0].lng
-    // );
-
-    // 件数ガード(オーバーなら描画をしない) (0204:非表示)
-    // if (earthquakes.length > MAX_POLYGON_COUNT) {
-    //   console.warn(
-    //     `[EarthquakePolygonLayer] polygon count over limit: ${earthquakes.length}`
-    //   );
-    //   return null;
-    // }
-
-    return earthquakes.map((eq) => (
+    // RiskLevelに応じて色を決め、Polygon描画
+    return filtered.map((eq) => (
       <Polygon
         key={eq.meshCode}
         paths={eq.polygon}
-        options={{
-          // earthquakePolygonStyleMap[eq.riskLevel]
-          // 以下一時的レイヤー(0204)
-          strokeColor: "#ff0000",
-          strokeOpacity: 1,
-          strokeWeight: 2,
-          fillColor: "#ff0000",
-          fillOpacity: 0.3
-        }}
+        // LOW/MEDIUM/HIGH
+        options={earthquakePolygonStyleMap[eq.riskLevel]}
       />
     ));
-  }, [earthquakes, zoom, bounds, activeLayer]);
+  }, [earthquakes, bounds]);
 
   return <>{polygons}</>;
 }

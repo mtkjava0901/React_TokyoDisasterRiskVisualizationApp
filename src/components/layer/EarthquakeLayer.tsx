@@ -1,12 +1,15 @@
-import { useAtom } from "jotai";
-import { earthquakeDataAtom } from "../../atoms/earthquakeDataAtom";
-import { Polygon } from "@react-google-maps/api";
-import { mapBoundsAtom } from "../../atoms/mapBoundsAtom";
+// import { useAtom } from "jotai";
+// import { earthquakeDataAtom } from "../../atoms/earthquakeDataAtom";
+// import { Polygon } from "@react-google-maps/api";
+// import { mapBoundsAtom } from "../../atoms/mapBoundsAtom";
 
 /**----------------------------------------
  * earthquakeDataAtomを読み込み、
  * MapViewのchildrenとして描画する
+ * (※2/4～ 初期検証用のため　以降未使用予定)
  ----------------------------------------*/
+
+/*
 export default function EarthquakeLayer() {
   const [earthquakes] = useAtom(earthquakeDataAtom);
 
@@ -42,3 +45,4 @@ export default function EarthquakeLayer() {
     </>
   );
 }
+*/

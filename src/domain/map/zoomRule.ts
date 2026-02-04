@@ -39,6 +39,32 @@ export const ZOOM_LIMIT = {
  * zoom値から表示ルールを決定する
 --------------------------------------- */
 export function resolveZoomRule(zoom: number): ZoomRuleResult {
+  // zoom8以下は何もしない
+  if (zoom <= 8) {
+    return {
+      fetchable: false,
+      meshLevel: "NONE"
+    };
+  }
+
+  // zoom9～13は詳細表示
+  if (zoom >= 9 && zoom <= 13) {
+    return {
+      fetchable: true,
+      meshLevel: "TERTIARY"
+    };
+  }
+
+  // zoom14以上は非対応
+  return {
+    fetchable: false,
+    meshLevel: "NONE"
+  };
+}
+
+/*
+  // （以下旧設計）
+
   // ズームアウトしすぎ
   if (zoom < ZOOM_LIMIT.MIN) {
     return {
@@ -79,3 +105,4 @@ export function resolveZoomRule(zoom: number): ZoomRuleResult {
     message: "これ以上ズームインできません"
   };
 }
+*/

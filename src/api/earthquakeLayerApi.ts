@@ -19,7 +19,6 @@ export const fetchEarthquakeLayer = async (
   maxLat: number,
   minLng: number,
   maxLng: number,
-  // meshLevel: MeshLevel
   meshLevel: number // 0204追加
 ) => {
   console.log("API request params:", {
