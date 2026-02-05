@@ -1,0 +1,31 @@
+/* 汎用 */
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* App */
+.app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Map用 */
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* MapContainer.jsx */
+.map-root {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}

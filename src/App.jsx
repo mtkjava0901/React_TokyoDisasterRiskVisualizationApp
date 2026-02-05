@@ -1,12 +1,27 @@
+import "/src/styles/style.css/";
+import "/src/styles/header.css";
+import "/src/styles/legendUI.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import MapContainer from "./components/map/MapContainer";
-//import TestMap from "./components/map/TestMap";
+import Header from "./components/layout/Header";
+
+/**-----------------------------------------
+ *
+ * 画面レイアウト
+ *
+----------------------------------------- */
 
 export default function App() {
   return (
-    <div>
-      <h1>TokyoDisasterRiskVisualizationApp</h1>
+    <div className="app">
+      <Header />
       <MapContainer />
-      {/* <TestMap /> */}
+
+      {/* 凡例 */}
+      {/* <Legend /> */}
+
+      {/* フッター */}
+      {/* <Footer /> */}
     </div>
   );
 }

@@ -3,7 +3,7 @@
  * フロント全体で再利用可能なクラス
 ------------------------------------------------------------------ */
 // 今後の為に分離して管理
-export type EarthquakeRiskLevel = "HIGH" | "MIDEUM" | "LOW";
+export type EarthquakeRiskLevel = "HIGH" | "MEDIUM" | "LOW";
 
 export type LatLng = {
   lat: number;

@@ -6,10 +6,13 @@ import MapView from "./MapView";
 import MapEventSync from "../../hooks/useMapEventSync";
 import EarthquakeDataController from "../controller/EarthquakeDataController";
 import EarthquakePolygonLayer from "./layers/earthquake/EarthquakePolygonLayer";
+import LegendUI from "./ui/LegendUI";
+import FooterUI from "./ui/FooterUI";
 
 /**------------------------------------------------------------------
- * GoogleMapを表示し、ユーザー操作(移動･ズーム)をjotaiのatomに同期させる
- * 地図の状態：ローカルstateに閉じず、アプリ全体で共有
+ * Map状態の管理・APIロードコンポーネント
+ * ・GoogleMapを表示し、ユーザー操作(移動･ズーム)をjotaiのatomに同期させる
+ * ・地図の状態：ローカルstateに閉じず、アプリ全体で共有
  --------------------------------------------------------------------*/
 const LIBRARIES = ["geometry"];
 
@@ -37,17 +40,30 @@ export default function MapContainer() {
 
   // 本体
   return (
-    <>
+    <div className="map-root">
       <MapView
         center={center}
         zoom={zoom}
-        onLoad={(map) => (mapRef.current = map)}
+        onLoad={(map) => {
+          mapRef.current = map;
+
+          map.setOptions({
+            padding: {
+              right: 320, // LegendUI分
+              bottom: 80 // FooterUI分
+            }
+          });
+        }}
         {...mapEvents} // onIdleをここで渡す
       >
         <EarthquakePolygonLayer />
       </MapView>
 
+      <LegendUI />
+
+      <FooterUI />
+
       <EarthquakeDataController />
-    </>
+    </div>
   );
 }

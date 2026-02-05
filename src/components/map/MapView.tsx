@@ -8,15 +8,15 @@ import { ReactNode } from "react";
  ------------------------------------------------------------------*/
 // props用の型を定義
 type MapViewProps = {
-  // 地図の中心座標
-  center: { lat: number; lng: number };
+  // 地図の中心座標(GoogleMaps公式型)
+  center: google.maps.LatLngLiteral;
   // 現在のズームレベル(=atom由来)
   zoom: number;
-  // GoogleMapが初期化された瞬間に呼ばれる(保持しない)
+  // GoogleMapが初期化された瞬間(保持しない)
   onLoad: (map: google.maps.Map) => void;
-  // ユーザー操作(移動･ズーム)が終わったタイミング(状態同期の入り口)
+  // ユーザー操作終了時(状態同期の入り口)
   onIdle: () => void;
-  // 地図の上に乗せるもの(Marker/Polygon/OverlayView/災害レイヤー)
+  // 地図の上に乗せるもの(Marker/Polygon/OverlayView/災害レイヤー等)
   children?: ReactNode;
 };
 
@@ -30,14 +30,22 @@ export default function MapView({
   console.log("MapView children:", children);
 
   return (
-    <GoogleMap
-      mapContainerStyle={{ width: "100%", height: "400px" }}
-      center={center}
-      zoom={zoom}
-      onLoad={onLoad}
-      onIdle={onIdle}
-    >
-      {children}
-    </GoogleMap>
+    <div className="map-container">
+      <GoogleMap
+        mapContainerStyle={{ width: "100%", height: "100%" }}
+        center={center}
+        zoom={zoom}
+        onLoad={onLoad}
+        onIdle={onIdle}
+        options={{
+          zoomControl: false,
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: false
+        }}
+      >
+        {children}
+      </GoogleMap>
+    </div>
   );
 }

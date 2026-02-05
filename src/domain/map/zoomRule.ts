@@ -31,7 +31,7 @@ export type ZoomRuleResult = {
  * 許可するzoom範囲
  ---------------------------------------*/
 export const ZOOM_LIMIT = {
-  MIN: 6,
+  MIN: 8,
   MAX: 13
 } as const;
 

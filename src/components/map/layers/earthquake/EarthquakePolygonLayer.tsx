@@ -8,7 +8,7 @@ import { mapBoundsAtom } from "../../../../atoms/mapBoundsAtom";
 import { activeLayerAtom } from "../../../../atoms/activeLayerAtom";
 
 /**---------------------------------------------
- * 地震Polygon描画専用コンポーネント
+ * 地震Polygonの描画専用コンポーネント
  * ・APIレスポンスデータ(EarthquakeLayerDto)を加工しない
  * ・riskLevelに応じた「見た目を決める」
  * ・描画だけに集中
@@ -84,6 +84,8 @@ function EarthquakePolygonLayer() {
       />
     ));
   }, [earthquakes, bounds]);
+
+  console.log("[EarthquakePolygonLayer] polygon count =", polygons?.length);
 
   return <>{polygons}</>;
 }
