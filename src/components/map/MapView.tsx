@@ -12,6 +12,8 @@ type MapViewProps = {
   center: google.maps.LatLngLiteral;
   // 現在のズームレベル(=atom由来)
   zoom: number;
+  // クリックした場合の動作
+  onClick?: (e: google.maps.MapMouseEvent) => void;
   // GoogleMapが初期化された瞬間(保持しない)
   onLoad: (map: google.maps.Map) => void;
   // ユーザー操作終了時(状態同期の入り口)
