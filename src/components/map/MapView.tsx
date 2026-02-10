@@ -15,7 +15,7 @@ type MapViewProps = {
   // クリックした場合の動作
   onClick?: (e: google.maps.MapMouseEvent) => void;
   // GoogleMapが初期化された瞬間(保持しない)
-  onLoad: (map: google.maps.Map) => void;
+  onLoad?: (map: google.maps.Map) => void;
   // ユーザー操作終了時(状態同期の入り口)
   onIdle: () => void;
   // 地図の上に乗せるもの(Marker/Polygon/OverlayView/災害レイヤー等)
@@ -25,6 +25,7 @@ type MapViewProps = {
 export default function MapView({
   center,
   zoom,
+  onClick,
   onLoad,
   onIdle,
   children
@@ -37,6 +38,7 @@ export default function MapView({
         mapContainerStyle={{ width: "100%", height: "100%" }}
         center={center}
         zoom={zoom}
+        onClick={onClick}
         onLoad={onLoad}
         onIdle={onIdle}
         options={{

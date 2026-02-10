@@ -8,7 +8,12 @@ import EarthquakeDataController from "../controller/EarthquakeDataController";
 import EarthquakePolygonLayer from "./layers/earthquake/EarthquakePolygonLayer";
 import LegendUI from "./ui/LegendUI";
 import FooterUI from "./ui/FooterUI";
-// import { Library } from "@react-google-maps/api";
+import { Marker } from "@react-google-maps/api";
+import { useState } from "react";
+import {
+  fetchNearestBoundary,
+  NearestBoundaryResponse
+} from "@/api/boundaryApi";
 
 /**------------------------------------------------------------------
  * Map状態の管理・APIロードコンポーネント
@@ -36,18 +41,35 @@ export default function MapContainer() {
     libraries: LIBRARIES
   });
 
-  // clickhandler追加(東京都内か？)
+  // Marker用state
+  const [markerPosition, setMarkerPosition] =
+    useState<google.maps.LatLngLiteral | null>(null);
+
+  // 東京都境界用state
+  const [boundaryResult, setBoundaryResult] =
+    useState<NearestBoundaryResponse | null>(null);
+
+  // clickhandler追加(東京都内か？)　※デバッグ用
   const handleMapClick = async (e: google.maps.MapMouseEvent) => {
     if (!e.latLng) return;
 
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
 
-    const res = await fetch(`/api/area/tokyo/contains?lat=${lat}&lng=${lng}`);
+    console.log("clicked:", { lat, lng });
 
-    const isTokyo: boolean = await res.json();
+    // Marker更新
+    setMarkerPosition({ lat, lng });
 
-    console.log(isTokyo ? "東京都内" : "東京都外");
+    // A-06をsingle sourceとする
+    const result = await fetchNearestBoundary(lat, lng);
+    setBoundaryResult(result);
+
+    console.log(
+      result.isTokyo ? "東京都内" : "東京都外",
+      "距離:",
+      result.distanceMeter
+    );
   };
 
   // MapOption型の拡張
@@ -71,7 +93,6 @@ export default function MapContainer() {
         zoom={zoom}
         onLoad={(map) => {
           if (!map) return; // null安全確認
-
           mapRef.current = map;
 
           (mapRef.current as any).setOptions({
@@ -79,8 +100,11 @@ export default function MapContainer() {
           });
         }}
         {...mapEvents} // onIdleをここで渡す
-        onClick={handleMapClick}
+        onClick={handleMapClick} // デバック用
       >
+        {/* クリックしたらMarker表示（デバッグ用） */}
+        {markerPosition && <Marker position={markerPosition} />}
+
         <EarthquakePolygonLayer />
       </MapView>
 
