@@ -1,0 +1,22 @@
+/* ステータスバナー用CSS */
+
+.tokyo-banner {
+  /* position: absolute; */
+  position: fixed;
+  top: 55px; /* header見ながら調整 */
+  left: 0;
+  right: 0;
+
+  height: 30px;
+  background: #dc143c;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  z-index: 1000;
+}

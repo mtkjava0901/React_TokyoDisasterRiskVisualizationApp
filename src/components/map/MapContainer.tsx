@@ -1,5 +1,5 @@
 import { useJsApiLoader } from "@react-google-maps/api";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { mapCenterAtom, mapZoomAtom } from "../../atoms/mapAtom";
 import { useRef } from "react";
 import MapView from "./MapView";
@@ -14,6 +14,8 @@ import {
   fetchNearestBoundary,
   NearestBoundaryResponse
 } from "@/api/boundaryApi";
+import TokyoStatusBanner from "./ui/TokyoStatusBanner";
+import { areaModeAtom } from "@/atoms/areaModeAtom";
 
 /**------------------------------------------------------------------
  * Map状態の管理・APIロードコンポーネント
@@ -27,6 +29,8 @@ export default function MapContainer() {
   const [center] = useAtom(mapCenterAtom);
   //const center = { lat: 35.854, lng: 139.156 };
   const [zoom] = useAtom(mapZoomAtom);
+  // 東京都外/都内用
+  const setAreaMode = useSetAtom(areaModeAtom);
 
   // mapインスタンスをrefに保存
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -55,21 +59,39 @@ export default function MapContainer() {
 
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
-
-    console.log("clicked:", { lat, lng });
-
-    // Marker更新
     setMarkerPosition({ lat, lng });
 
-    // A-06をsingle sourceとする
-    const result = await fetchNearestBoundary(lat, lng);
-    setBoundaryResult(result);
+    try {
+      const result = await fetchNearestBoundary(lat, lng);
 
-    console.log(
-      result.isTokyo ? "東京都内" : "東京都外",
-      "距離:",
-      result.distanceMeter
-    );
+      console.log("clicked:", { lat, lng });
+      console.log("A-06 result:", result);
+      // console.log("nearestPoint:", result.nearestPoint);
+
+      if (!result) {
+        setAreaMode("API_ERROR");
+        return;
+      }
+
+      // 東京都外
+      if (!result.isTokyo) {
+        setAreaMode("OUTSIDE_TOKYO");
+
+        // 最寄り東京都境界へ移動
+        mapRef.current?.panTo({
+          lat: result.nearestPoint.lat,
+          lng: result.nearestPoint.lng
+        });
+
+        return;
+      }
+
+      // 東京都内
+      setAreaMode("INSIDE_TOKYO");
+    } catch (error) {
+      console.error(error);
+      setAreaMode("API_ERROR");
+    }
   };
 
   // MapOption型の拡張
@@ -108,10 +130,9 @@ export default function MapContainer() {
         <EarthquakePolygonLayer />
       </MapView>
 
+      <TokyoStatusBanner />
       <LegendUI />
-
       <FooterUI />
-
       <EarthquakeDataController />
     </div>
   );

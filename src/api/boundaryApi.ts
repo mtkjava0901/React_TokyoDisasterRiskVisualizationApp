@@ -5,7 +5,6 @@ import axios from "axios";
  -------------------------------*/
 export type NearestBoundaryResponse = {
   isTokyo: boolean;
-  // distance: number;
   distanceMeter: number;
   nearestPoint: {
     lat: number;
@@ -20,5 +19,13 @@ export const fetchNearestBoundary = async (
   const res = await axios.get("/api/area/tokyo/nearest-boundary", {
     params: { lat, lng }
   });
-  return res.data;
+
+  return {
+    isTokyo: res.data.tokyo,
+    distanceMeter: res.data.nearestBoundary.distanceMeter,
+    nearestPoint: {
+      lat: res.data.nearestBoundary.lat,
+      lng: res.data.nearestBoundary.lng
+    }
+  };
 };

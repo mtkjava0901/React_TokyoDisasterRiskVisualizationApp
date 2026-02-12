@@ -24,8 +24,10 @@ body,
 
 /* MapContainer.jsx */
 .map-root {
-  position: fixed;
-  inset: 0;
+  /* position: fixed; */
+  position: relative;
+  overflow: visible;
+  /* inset: 0; */
   width: 100%;
   height: 100%;
 }

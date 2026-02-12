@@ -48,13 +48,19 @@ function EarthquakePolygonLayer() {
     * （earthquakesが変わらない限り再生成しない）
    ---------------------------------------------*/
   const polygons = useMemo(() => {
+    // console.log("=== useMemo start ===");
+    // console.log("activeLayer:", activeLayer);
+    // console.log("zoom:", zoom);
+    // console.log("bounds:", bounds);
+    // console.log("earthquakes length:", earthquakes.length);
+
     // レイヤー非アクティブの場合(入口ガード)
-    if (activeLayer !== "earthquake") return null;
-    if (!bounds) return null;
+    if (activeLayer !== "earthquake") return [];
+    if (!bounds) return [];
 
     // zoomガード
-    if (zoom < DETAIL_RENDER_ZOOM || zoom > MAX_RENDER_ZOOM) return null;
-    if (earthquakes.length === 0) return null;
+    if (zoom < DETAIL_RENDER_ZOOM || zoom > MAX_RENDER_ZOOM) return [];
+    if (earthquakes.length === 0) return [];
 
     // 表示範囲に含まれるポリゴンのみ抽出
     const filtered = earthquakes.filter((eq) =>
@@ -66,6 +72,7 @@ function EarthquakePolygonLayer() {
           p.lng <= bounds.maxLng
       )
     );
+    // console.log("filtered count:", filtered.length);
 
     if (filtered.length > MAX_POLYGON_COUNT) {
       console.warn(
