@@ -5,7 +5,7 @@ export type TokyoContainsResponse = {
 };
 
 /**--------------------------------
- * 東京都内判定用API
+ * 東京都内判定用API(A-05)
  --------------------------------*/
 export const checkTokyoContains = async (
   lat: number,

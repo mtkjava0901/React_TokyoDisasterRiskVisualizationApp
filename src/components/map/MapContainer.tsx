@@ -1,34 +1,98 @@
 import { useJsApiLoader } from "@react-google-maps/api";
-import { useAtom, useSetAtom } from "jotai";
-import { mapCenterAtom, mapZoomAtom } from "../../atoms/mapAtom";
-import { useRef } from "react";
 import MapView from "./MapView";
-import MapEventSync from "../../hooks/useMapEventSync";
-import EarthquakeDataController from "../controller/EarthquakeDataController";
 import EarthquakePolygonLayer from "./layers/earthquake/EarthquakePolygonLayer";
 import LegendUI from "./ui/LegendUI";
 import FooterUI from "./ui/FooterUI";
-import { Marker } from "@react-google-maps/api";
-import { useState } from "react";
-import {
-  fetchNearestBoundary,
-  NearestBoundaryResponse
-} from "@/api/boundaryApi";
 import TokyoStatusBanner from "./ui/TokyoStatusBanner";
-import { areaModeAtom } from "@/atoms/areaModeAtom";
 
-/**------------------------------------------------------------------
- * Map状態の管理・APIロードコンポーネント
- * ・GoogleMapを表示し、ユーザー操作(移動･ズーム)をjotaiのatomに同期させる
- * ・地図の状態：ローカルstateに閉じず、アプリ全体で共有
- --------------------------------------------------------------------*/
+import useMapEventSync from "@/hooks/useMapEventSync";
+import { useEarthquakeLayer } from "@/hooks/useEarthquakeLayer";
+import { useRiskFlow } from "@/hooks/useRiskFlow";
+import { useSyncMeshLevel } from "@/hooks/useSyncMeshLevel";
+
+import { useRef } from "react";
+import { useAtomValue } from "jotai";
+import { mapCenterAtom, mapZoomAtom } from "@/atoms/mapAtom";
+
 const LIBRARIES: "geometry"[] = ["geometry"];
-
+/**------------------------------------------------------------------
+ *
+ * MapContainer（組み立て専用）
+ *
+ * 責務：
+ * ・GoogleMapロード
+ * ・hook呼び出し
+ * ・UI表示
+ *
+ --------------------------------------------------------------------*/
 export default function MapContainer() {
+  // GoogleMapsAPIロード
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: LIBRARIES
+  });
+
+  // atomから読む
+  const center = useAtomValue(mapCenterAtom);
+  const zoom = useAtomValue(mapZoomAtom);
+
+  // map instance
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  /**--------------------------------------
+   * hookの実行
+   --------------------------------------*/
+  const mapEvents =
+    // Map状態の同期
+    useMapEventSync({ mapRef });
+  // zoom→meshの同期
+  useSyncMeshLevel();
+  // A-01.EarthquakeLayer取得
+  useEarthquakeLayer();
+
+  // A-05⇒A-03⇒A-06 リスクフロー
+  const { runRiskFlow } = useRiskFlow();
+
+  // Mapクリック⇒座標抽出⇒Flow
+  const handleMapClick = (e: google.maps.MapMouseEvent) => {
+    if (!e.latLng) return;
+
+    runRiskFlow(e.latLng.lat(), e.latLng.lng());
+  };
+
+  if (!isLoaded) return <div>Now Loading...</div>;
+
+  // 本体
+  return (
+    <div className="map-root">
+      <MapView
+        center={center}
+        zoom={zoom}
+        onLoad={(map) => (mapRef.current = map)}
+        onClick={handleMapClick}
+        {...mapEvents}
+      >
+        <EarthquakePolygonLayer />
+      </MapView>
+
+      <TokyoStatusBanner />
+      <LegendUI />
+      <FooterUI />
+    </div>
+  );
+}
+
+/*
   // atomからstateを取得
   const [center] = useAtom(mapCenterAtom);
-  //const center = { lat: 35.854, lng: 139.156 };
+  // const center = { lat: 35.854, lng: 139.156 };
   const [zoom] = useAtom(mapZoomAtom);
+  // meshLevelの同期
+  const [, setMeshLevel] = useAtom(meshLevelAtom);
+  useEffect(() => {
+    setMeshLevel(getMeshLevelFromZoom(zoom));
+  }, [zoom]);
+
   // 東京都外/都内用
   const setAreaMode = useSetAtom(areaModeAtom);
 
@@ -94,6 +158,9 @@ export default function MapContainer() {
     }
   };
 
+  // zoomに応じて取得
+  const currentMeshLevel = 8;
+
   // MapOption型の拡張
   interface MapOptionsWithPadding extends google.maps.MapOptions {
     padding?: {
@@ -124,16 +191,33 @@ export default function MapContainer() {
         {...mapEvents} // onIdleをここで渡す
         onClick={handleMapClick} // デバック用
       >
-        {/* クリックしたらMarker表示（デバッグ用） */}
+
         {markerPosition && <Marker position={markerPosition} />}
 
         <EarthquakePolygonLayer />
       </MapView>
 
       <TokyoStatusBanner />
+
+      <button
+        style={{ position: "absolute", top: 10, left: 10, zIndex: 999 }}
+        onClick={async () => {
+          const result = await fetchEarthquakeRisk(
+            35.66890651477193,
+            139.38249822835303,
+            currentMeshLevel
+          );
+          console.log("A-03 test result:", result);
+        }}
+      >
+        A-03 TEST
+      </button>
+
       <LegendUI />
       <FooterUI />
       <EarthquakeDataController />
     </div>
   );
 }
+
+*/
