@@ -2,6 +2,10 @@ import { useAtom } from "jotai";
 import { useRiskPoint } from "./useRiskPoint";
 import { riskUiAtom } from "@/atoms/riskUiAtom";
 import { normalizePoint } from "@/domain/risk/normalizePoint";
+import { riskResultAtom } from "@/atoms/riskResultAtom";
+import { checkTokyoContains } from "@/api/tokyoAreaApi";
+import { fetchNearestBoundary } from "@/api/boundaryApi";
+import { areaModeAtom } from "@/atoms/areaModeAtom";
 
 /**----------------------------------------
  * 順制御hook（オーケストレーションhook）
@@ -24,34 +28,75 @@ import { normalizePoint } from "@/domain/risk/normalizePoint";
  *      2.クリック⇒リスクフロー
  *      3.UI表示
  ----------------------------------------*/
+export type RiskFlowResult = {
+  result: any | null;
+  isTokyo: boolean;
+  nearestPoint?: { lat: number; lng: number };
+};
+
 export function useRiskFlow() {
   const { fetchRisk, clearRisk } = useRiskPoint();
   const [, setUi] = useAtom(riskUiAtom);
+  const [, setResult] = useAtom(riskResultAtom);
+  const [, setAreaMode] = useAtom(areaModeAtom);
 
   /**------------------------------------
    * メイン実行フロー
    ------------------------------------*/
-  const runRiskFlow = async (lat: number, lng: number) => {
+  const runRiskFlow = async (
+    lat: number,
+    lng: number
+  ): Promise<RiskFlowResult> => {
+    console.log("[runRiskFlow] called:", lat, lng);
     try {
       // UI loading ON
       setUi({ loading: true, error: null });
 
-      // --- A-05 前処理 ---
+      // A-05 前処理
       const point = normalizePoint(lat, lng);
 
-      // --- A-03 API ---
+      // A-05 東京都内判定
+      const tokyoCheck = await checkTokyoContains(point.lat, point.lng);
+
+      // A-06 都外の場合
+      if (!tokyoCheck.isTokyo) {
+        setAreaMode("OUTSIDE_TOKYO");
+
+        const nearest = await fetchNearestBoundary(point.lat, point.lng);
+
+        setUi({ loading: false, error: null });
+
+        return {
+          result: null,
+          isTokyo: false,
+          nearestPoint: nearest.nearestPoint
+        };
+      }
+
+      // 都内 → A-03
+      setAreaMode("INSIDE_TOKYO");
+
       const result = await fetchRisk(point.lat, point.lng);
 
-      if (!result) {
-        throw new Error("Risk fetch failed");
-      }
+      if (!result) throw new Error("Risk fetch failed");
+
+      setResult({
+        lat: point.lat,
+        lng: point.lng,
+        earthquake: result.riskLevel
+      });
 
       // --- A-06 UI更新（成功）
       setUi({ loading: false, error: null });
 
-      return result;
+      return {
+        result,
+        isTokyo: true
+      };
     } catch (err) {
       console.error("[useRiskFlow]", err);
+
+      setAreaMode("API_ERROR");
 
       setUi({
         loading: false,
@@ -59,7 +104,11 @@ export function useRiskFlow() {
       });
 
       clearRisk();
-      return null;
+
+      return {
+        result: null,
+        isTokyo: false
+      };
     }
   };
 

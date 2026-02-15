@@ -1,7 +1,10 @@
 import { useAtom } from "jotai";
 import { activeLayerAtom } from "../../atoms/activeLayerAtom";
+
 import "../../styles/header.css";
 import "../../styles/style.css";
+import { useState } from "react";
+import { useLocationController } from "@/hooks/location/useLocationController";
 
 /**-------------------------
  * Headerパーツ
@@ -9,12 +12,40 @@ import "../../styles/style.css";
 export default function Header() {
   const [activeLayer, setActiveLayer] = useAtom(activeLayerAtom);
 
+  // 住所入力
+  const [address, setAddress] = useState("");
+  // Location操作
+  const { searchAddress, moveToCurrentLocation } = useLocationController();
+
+  // Layer toggle Earthquake
   const toggleEarthquake = () => {
     setActiveLayer((prev) => (prev === "earthquake" ? null : "earthquake"));
   };
 
+  // Layer toggle Flood
   const toggleFlood = () => {
     setActiveLayer((prev) => (prev === "flood" ? null : "flood"));
+  };
+
+  // 住所検索
+  const handleSearch = async () => {
+    if (!address.trim()) return;
+
+    const result = await searchAddress(address);
+
+    if (!result) {
+      alert("住所が見つかりません");
+      return;
+    }
+
+    setAddress("");
+  };
+
+  // Enterで検索
+  const handlekeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
   };
 
   return (
@@ -24,9 +55,16 @@ export default function Header() {
         <input
           className="search-input"
           placeholder="住所・駅名・地名を入力"
-          disabled
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          onKeyDown={handlekeyDown}
         />
-        <button className="icon-button" title="現在地">
+
+        <button
+          className="icon-button"
+          title="現在地"
+          onClick={moveToCurrentLocation}
+        >
           <i className="bi bi-geo-alt-fill" />
         </button>
       </div>

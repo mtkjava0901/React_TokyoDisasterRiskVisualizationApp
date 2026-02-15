@@ -4,25 +4,35 @@ import EarthquakePolygonLayer from "./layers/earthquake/EarthquakePolygonLayer";
 import LegendUI from "./ui/LegendUI";
 import FooterUI from "./ui/FooterUI";
 import TokyoStatusBanner from "./ui/TokyoStatusBanner";
+import RiskResultPanel from "./ui/RiskResultPanel";
 
 import useMapEventSync from "@/hooks/useMapEventSync";
 import { useEarthquakeLayer } from "@/hooks/useEarthquakeLayer";
-import { useRiskFlow } from "@/hooks/useRiskFlow";
 import { useSyncMeshLevel } from "@/hooks/useSyncMeshLevel";
 
 import { useRef } from "react";
 import { useAtomValue } from "jotai";
 import { mapCenterAtom, mapZoomAtom } from "@/atoms/mapAtom";
 
+import LocationTest from "../debug/LocationTest";
+import { useLocationController } from "@/hooks/location/useLocationController";
+
 const LIBRARIES: "geometry"[] = ["geometry"];
+
 /**------------------------------------------------------------------
  *
  * MapContainer（組み立て専用）
  *
- * 責務：
+ * やる事：
  * ・GoogleMapロード
  * ・hook呼び出し
- * ・UI表示
+ * ・UI配置
+ * ・MapViewへprops渡し
+ * 
+ * やらない事：
+ * ・APIロジック
+ * ・地図操作ロジック
+ * ・Risk処理
  *
  --------------------------------------------------------------------*/
 export default function MapContainer() {
@@ -32,15 +42,15 @@ export default function MapContainer() {
     libraries: LIBRARIES
   });
 
-  // atomから読む
+  // Global state
   const center = useAtomValue(mapCenterAtom);
   const zoom = useAtomValue(mapZoomAtom);
 
-  // map instance
+  // Map instance
   const mapRef = useRef<google.maps.Map | null>(null);
 
   /**--------------------------------------
-   * hookの実行
+   * hookの実行(副作用系)
    --------------------------------------*/
   const mapEvents =
     // Map状態の同期
@@ -50,16 +60,44 @@ export default function MapContainer() {
   // A-01.EarthquakeLayer取得
   useEarthquakeLayer();
 
-  // A-05⇒A-03⇒A-06 リスクフロー
-  const { runRiskFlow } = useRiskFlow();
+  /**--------------------------------------
+   * Location操作（クリック・現在地・住所検索）
+   --------------------------------------*/
+  const { handleMapClick, moveToCurrentLocation, searchAddress } =
+    useLocationController(mapRef);
+
+  // A-05⇒A-03(A-04)⇒A-06 リスクフロー
+  // const { runRiskFlow } = useRiskFlow();
+
+  // 現在地hook取得
+  // const { getCurrentLocation } = useCurrentLocation();
 
   // Mapクリック⇒座標抽出⇒Flow
-  const handleMapClick = (e: google.maps.MapMouseEvent) => {
-    if (!e.latLng) return;
+  // const handleMapClick = (e: google.maps.MapMouseEvent) => {
+  //   if (!e.latLng) return;
+  //   runRiskFlow(e.latLng.lat(), e.latLng.lng());
+  // };
 
-    runRiskFlow(e.latLng.lat(), e.latLng.lng());
-  };
+  // 現在地⇒RiskFlow
+  // const handleCurrentLocation = async () => {
+  //   const loc = await getCurrentLocation();
 
+  //   if (!loc) {
+  //     console.log("現在地取得失敗");
+  //     return;
+  //   }
+
+  //   console.log("現在地:", loc);
+
+  //   // RiskFlow実行
+  //   await runRiskFlow(loc.lat, loc.lng);
+
+  //   // Mapを現在地へ移動
+  //   mapRef.current?.panTo(loc);
+  //   mapRef.current?.setZoom(13);
+  // };
+
+  // 読み込み中
   if (!isLoaded) return <div>Now Loading...</div>;
 
   // 本体
@@ -68,19 +106,31 @@ export default function MapContainer() {
       <MapView
         center={center}
         zoom={zoom}
-        onLoad={(map) => (mapRef.current = map)}
+        onLoad={(map) => {
+          console.log("MAP LOADED");
+          mapRef.current = map;
+          }}
         onClick={handleMapClick}
         {...mapEvents}
       >
         <EarthquakePolygonLayer />
       </MapView>
 
+      <RiskResultPanel />
+
       <TokyoStatusBanner />
       <LegendUI />
       <FooterUI />
+
+      <LocationTest
+        onCurrentLocation={moveToCurrentLocation}
+        onSearchAddress={searchAddress}
+      />
     </div>
   );
 }
+
+/***********************************************************************************************/
 
 /*
   // atomからstateを取得

@@ -20,12 +20,21 @@ export const fetchNearestBoundary = async (
     params: { lat, lng }
   });
 
+  // 仮実装
+  const isTokyo = res.data.tokyo;
+  const nearest = res.data.nearestBoundary;
+
+  if (!nearest) {
+    console.error("Nearest data is missing in response!", res.data);
+    throw new Error("Nearest data is missing");
+  }
+
   return {
-    isTokyo: res.data.tokyo,
-    distanceMeter: res.data.nearestBoundary.distanceMeter,
+    isTokyo: isTokyo,
+    distanceMeter: nearest.distanceMeter,
     nearestPoint: {
-      lat: res.data.nearestBoundary.lat,
-      lng: res.data.nearestBoundary.lng
+      lat: nearest.lat,
+      lng: nearest.lng
     }
   };
 };

@@ -4,15 +4,15 @@ import { apiClient } from "./client";
 /**---------------------------------------
  * A-03 地震リスク1点判定 API
  * backend:
- * POST /api/earthquake/risk/point
+ * GET /api/earthquake/risk/
  ----------------------------------------*/
 
 /** APIリクエスト型 */
-export type EarthquakeRiskRequest = {
-  lat: number;
-  lng: number;
-  meshLevel: number;
-};
+// export type EarthquakeRiskRequest = {
+//   lat: number;
+//   lng: number;
+//   meshLevel: number;
+// };
 
 /** APIレスポンス型（ThunderClient確認済） */
 export type EarthquakeRiskResponse = {
@@ -24,13 +24,13 @@ export type EarthquakeRiskResponse = {
 ------------------------ */
 export async function fetchEarthquakeRisk(
   lat: number,
-  lng: number,
-  meshLevel: number
+  lng: number
 ): Promise<EarthquakeRiskResponse | null> {
   try {
+    console.log("fetch params", { lat, lng });
     const response = await axios.get<EarthquakeRiskResponse>(
       "http://localhost:8080/api/earthquake/risk",
-      { params: { lat, lng, meshLevel } }
+      { params: { lat, lng } }
     );
 
     return response.data;
