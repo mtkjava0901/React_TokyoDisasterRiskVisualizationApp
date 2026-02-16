@@ -20,6 +20,7 @@ import { useMapController } from "@/hooks/map/useMapController";
 import EarthquakeDataController from "../controller/EarthquakeDataController";
 import { useAutoRiskController } from "@/hooks/risk/useAutoRiskController";
 import CrosshairUI from "@/components/map/ui/CrossHairUI";
+import { useRiskLocationController } from "@/hooks/risk/useRiskLocationController";
 
 const LIBRARIES: "geometry"[] = ["geometry"];
 
@@ -63,45 +64,17 @@ export default function MapContainer() {
   useSyncMeshLevel();
   // 地震レイヤー取得
   useEarthquakeLayer();
-  // Map中心地リスク取得
-  useAutoRiskController();
+  // Map中心地リスク取得(0216停止)
+  // useAutoRiskController();
+  //
+  useRiskLocationController();
 
   /**--------------------------------------
    * Location操作（クリック・現在地・住所検索）
    --------------------------------------*/
   const { handleMapClick, moveToCurrentLocation, searchAddress } =
-    useLocationController(mapRef);
-
-  // A-05⇒A-03(A-04)⇒A-06 リスクフロー
-  // const { runRiskFlow } = useRiskFlow();
-
-  // 現在地hook取得
-  // const { getCurrentLocation } = useCurrentLocation();
-
-  // Mapクリック⇒座標抽出⇒Flow
-  // const handleMapClick = (e: google.maps.MapMouseEvent) => {
-  //   if (!e.latLng) return;
-  //   runRiskFlow(e.latLng.lat(), e.latLng.lng());
-  // };
-
-  // 現在地⇒RiskFlow
-  // const handleCurrentLocation = async () => {
-  //   const loc = await getCurrentLocation();
-
-  //   if (!loc) {
-  //     console.log("現在地取得失敗");
-  //     return;
-  //   }
-
-  //   console.log("現在地:", loc);
-
-  //   // RiskFlow実行
-  //   await runRiskFlow(loc.lat, loc.lng);
-
-  //   // Mapを現在地へ移動
-  //   mapRef.current?.panTo(loc);
-  //   mapRef.current?.setZoom(13);
-  // };
+    // useLocationController(mapRef);
+    useLocationController();
 
   // 読み込み中
   if (!isLoaded) return <div>Now Loading...</div>;

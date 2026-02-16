@@ -1,39 +1,45 @@
 import { useAtomValue } from "jotai";
 import { riskUiAtom } from "@/atoms/riskUiAtom";
 import { riskResultAtom } from "@/atoms/riskResultAtom";
+import "@/styles/risk-panel.css";
+import { riskLocationStatusAtom } from "@/atoms/riskLocationAtom";
 
+/**-------------------------
+ * 災害リスクパネル
+ *
+------------------------- */
 export default function RiskResultPanel() {
   const ui = useAtomValue(riskUiAtom);
   const result = useAtomValue(riskResultAtom);
+  // 状態表示テスト
+  const status = useAtomValue(riskLocationStatusAtom);
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        right: 0,
-        top: 80,
-        width: 300,
-        background: "white",
-        padding: 16,
-        borderLeft: "1px solid #ddd",
-        boxShadow: "-2px 0 6px rgba(0,0,0,0.1)",
-        zIndex: 999
-      }}
-    >
-      <h3>選択地点の災害リスク</h3>
+    <div className="risk-panel">
+      <div className="risk-panel-title">選択地点の災害リスク</div>
+      {/* Loading */}
+      {ui.loading && <div className="risk-panel-message">取得中...</div>}
+      {/* error */}
+      {ui.error && <div className="risk-panel-error">{ui.error}</div>}
+      {/* 未選択 */}
+      {!ui.loading && !result && (
+        <div className="risk-panel-message">
+          地図を移動して地点を選択してください
+        </div>
+      )}
 
-      {ui.loading && <p>取得中...</p>}
-
-      {ui.error && <p style={{ color: "red" }}>{ui.error}</p>}
-
-      {!ui.loading && !result && <p>地点を選択してください</p>}
-
-      {result && (
+      {/* 結果 */}
+      {result && !ui.loading && (
         <>
-          <div>地震リスク: {result.earthquake}</div>
-          <div>
-            座標: {result.lat.toFixed(5)}, {result.lng.toFixed(5)}
+          <div className="risk-item">
+            <span className="risk-label">地震リスク</span>
+            <span className="risk-value">{result.earthquake}</span>
           </div>
+
+          <div>状態: {status}</div>
+
+          {/* Step3で住所追加予定 */}
+          {/* Step4でリスク色追加予定 */}
         </>
       )}
     </div>

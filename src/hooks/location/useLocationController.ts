@@ -6,6 +6,7 @@ import useGeocoding from "../useGeocoding";
 
 /**-------------------------------------------------
  * Location統合Controller
+ * ⇒ユーザー操作の制御
  *
  * 責務：
  * ・現在地検索
@@ -13,9 +14,16 @@ import useGeocoding from "../useGeocoding";
  * ・Mapクリック
  * ・Map移動
  * ・RiskFlow実行
+ * ⇒入力レイヤ
 *
 * UI ⇒ Location ⇒ Map/Risk の司令塔役
 -------------------------------------------------*/
+// trigger種別
+export type LocationTrigger =
+  | "MAP_CLICK"
+  | "CURRENT_LOCATION"
+  | "ADDRESS_SEARCH";
+
 export function useLocationController() {
   // 現在地取得
   const { getCurrentLocation } = useCurrentLocation();
@@ -27,22 +35,53 @@ export function useLocationController() {
   const { geocode } = useGeocoding();
 
   /**----------------------------------
-  * 共通：
-  * ・座標 ⇒ Map移動 ⇒ Risk
-  * ・全てここを通す
+  * 共通フロー：
+  * ・Map移動
+  * ・RiskFlow
+  * ・triggerごとに補正制御
+  * ⇒全てここを通す
   ----------------------------------*/
   const runLocationFlow = useCallback(
-    async (lat: number, lng: number, zoom?: number) => {
+    async (
+      lat: number,
+      lng: number,
+      zoom?: number,
+      trigger: LocationTrigger = "MAP_CLICK"
+    ) => {
       try {
+        console.log("[runLocationFlow]", { lat, lng, trigger });
+
         // Map移動 + Risk並列
         const [_, flow] = await Promise.all([
           Promise.resolve(moveMap({ lat, lng }, zoom)),
           runRiskFlow(lat, lng)
         ]);
 
-        // 東京都外なら最近接へ
-        if (!flow.isTokyo && flow.nearestPoint) {
-          moveMap(flow.nearestPoint, zoom);
+        // 東京都外なら最近接へ(0216停止)
+        // if (!flow.isTokyo && flow.nearestPoint) {
+        //   moveMap(flow.nearestPoint, zoom);
+        // }
+        if (!flow) return null;
+
+        // trigger別挙動
+        switch (trigger) {
+          // 住所検索 ⇒ 都外なら補正
+          case "ADDRESS_SEARCH":
+            if (!flow.isTokyo && flow.nearestPoint) {
+              console.log("[Location] outside ⇒ move nearest Tokyo");
+              moveMap(flow.nearestPoint, zoom);
+            }
+            break;
+
+          // 現在地 ⇒ 補正しない
+          case "CURRENT_LOCATION":
+            // 状態だけOUTSIDE表示
+            break;
+
+          // Mapクリック ⇒ 補正しない
+          case "MAP_CLICK":
+            // 状態だけOUTSIDE表示
+            break;
         }
 
         return flow;
@@ -63,24 +102,13 @@ export function useLocationController() {
 
     const { lat, lng } = location;
 
-    // Map移動+Risk並列
-    // const [_, flow] = await Promise.all([
-    //   Promise.resolve(moveMap({ lat, lng }, 13)),
-    //   runRiskFlow(lat, lng)
-    // ]);
-
-    // 都外なら最近接へ
-    // if (!flow.isTokyo && flow.nearestPoint) {
-    //   moveMap(flow.nearestPoint, 13);
-    // }
-
-    await runLocationFlow(lat, lng, 13);
+    await runLocationFlow(lat, lng, 13, "CURRENT_LOCATION");
 
     return location;
   }, [getCurrentLocation, runLocationFlow]);
 
   /**----------------------------------
-   * 住所検索 ⇒ Geocode ⇒ Flow
+   * 住所検索
    ----------------------------------*/
   const searchAddress = useCallback(
     async (address: string) => {
@@ -89,65 +117,15 @@ export function useLocationController() {
       const loc = await geocode(address);
       if (!loc) return null;
 
-      await runLocationFlow(loc.lat, loc.lng, 15);
+      await runLocationFlow(loc.lat, loc.lng, 13, "ADDRESS_SEARCH");
 
       return loc;
     },
     [geocode, runLocationFlow]
   );
 
-  // const geocodeAddress = async (
-  //   address: string
-  // ): Promise<google.maps.GeocoderResult[]> => {
-  //   if (!address.trim()) return [];
-
-  //   const geocoder = new google.maps.Geocoder();
-
-  //   try {
-  //     // Promise形式で直接awaitできる
-  //     const { results } = await geocoder.geocode({ address });
-
-  //     return results ?? [];
-  //   } catch (err) {
-  //     console.error("[geocodeAddress]", err);
-  //     throw err;
-  //   }
-  // };
-
   /*----------------------------------
-   * 住所検索 → Map移動 → Risk
-  ----------------------------------*/
-  // const searchAddress = useCallback(
-  //   async (address: string) => {
-  //     if (!address.trim()) return null;
-  //     try {
-  //       const results = await geocodeAddress(address);
-  //       if (!results.length) return null;
-  //       const loc = results[0].geometry.location;
-  //       const lat = loc.lat();
-  //       const lng = loc.lng();
-  //       // 並列実行
-  //       // アニメーション中にAPIが終わっていれば即座に結果を表示できる
-  //       const [_, flow] = await Promise.all([
-  //         Promise.resolve(moveMap({ lat, lng }, 15)),
-  //         runRiskFlow(lat, lng)
-  //       ]);
-
-  //       if (!flow.isTokyo && flow.nearestPoint) {
-  //         moveMap(flow.nearestPoint, 15);
-  //       }
-
-  //       return { lat, lng };
-  //     } catch (err) {
-  //       console.error("[searchAddress]", err);
-  //       return null;
-  //     }
-  //   },
-  //   [runRiskFlow, moveMap]
-  // );
-
-  /*----------------------------------
-   Mapクリック → Flow
+   Mapクリック　※後に削除予定
   ----------------------------------*/
   const handleMapClick = useCallback(
     async (e: google.maps.MapMouseEvent) => {
@@ -156,74 +134,10 @@ export function useLocationController() {
       const lat = e.latLng.lat();
       const lng = e.latLng.lng();
 
-      // 並列実行
-      // const [_, flow] = await Promise.all([
-      //   Promise.resolve(moveMap({ lat, lng })),
-      //   runRiskFlow(lat, lng)
-      // ]);
-
-      // if (!flow.isTokyo && flow.nearestPoint) {
-      //   moveMap(flow.nearestPoint);
-      // }
-      await runLocationFlow(lat, lng);
+      await runLocationFlow(lat, lng, undefined, "MAP_CLICK");
     },
     [runLocationFlow]
   );
-
-  /**----------------------------------
-   * Map移動共通（Promise化）(未使用予定)
-  ----------------------------------*/
-  // const smoothPan = useCallback(
-  //   (lat: number, lng: number): Promise<void> => {
-  //     return new Promise((resolve) => {
-  //       // mapRefがない場合即修了
-  //       if (!mapRef?.current) {
-  //         console.log("mapRef null → 移動スキップ");
-  //         resolve();
-  //         return;
-  //       }
-
-  //       console.log("moving map");
-
-  //       const map = mapRef.current;
-  //       const start = map.getCenter();
-
-  //       // 中心が取れない場合も終了
-  //       if (!start) {
-  //         resolve();
-  //         return;
-  //       }
-
-  //       const startLat = start.lat();
-  //       const startLng = start.lng();
-
-  //       const steps = 20; // なめらかさ
-  //       const duration = 300; // ms
-  //       let i = 0;
-
-  //       const animate = () => {
-  //         i++;
-  //         const progress = i / steps;
-
-  //         const nextLat = startLat + (lat - startLat) * progress;
-  //         const nextLng = startLng + (lng - startLng) * progress;
-
-  //         map.panTo({ lat: nextLat, lng: nextLng });
-
-  //         if (i < steps) {
-  //           setTimeout(animate, duration / steps);
-  //         } else {
-  //           // アニメーション完了
-  //           console.log("moving map done");
-  //           resolve();
-  //         }
-  //       };
-
-  //       animate();
-  //     });
-  //   },
-  //   [mapRef]
-  // );
 
   return {
     moveToCurrentLocation,

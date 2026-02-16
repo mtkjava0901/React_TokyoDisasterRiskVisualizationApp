@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useAtomValue } from "jotai";
 import { mapCenterAtom } from "@/atoms/mapAtom";
 import { useRiskFlow } from "@/hooks/useRiskFlow";
+import { useMapController } from "@/hooks/map/useMapController";
 
 /**--------------------------------------------------
  * Map中央のリスク自動取得Controller
@@ -15,6 +16,7 @@ import { useRiskFlow } from "@/hooks/useRiskFlow";
 export function useAutoRiskController() {
   const center = useAtomValue(mapCenterAtom);
   const { runRiskFlow } = useRiskFlow();
+  const { moveMap } = useMapController(); //2016追記
 
   // 同一点再取得防止
   const lastKeyRef = useRef<string | null>(null);
@@ -42,10 +44,10 @@ export function useAutoRiskController() {
         if (!flow.isTokyo && flow.nearestPoint) {
           console.log("[AutoRisk] move nearest Tokyo");
 
-          // mapController経由で移動
-          const { useMapController } =
-            await import("@/hooks/map/useMapController");
-          const { moveMap } = useMapController();
+          // mapController経由で移動(0216停止)
+          // const { useMapController } =
+          //   await import("@/hooks/map/useMapController");
+          // const { moveMap } = useMapController();
 
           moveMap(flow.nearestPoint, 13);
         }
