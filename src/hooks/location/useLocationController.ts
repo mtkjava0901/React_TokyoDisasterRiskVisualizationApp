@@ -4,14 +4,14 @@ import { useCurrentLocation } from "./useCurrentLocation";
 
 /**-------------------------------------------------
  * Location統合Controller
- * 
+ *
  * 責務：
  * ・現在地検索
  * ・住所検索
  * ・Mapクリック
  * ・Map移動
  * ・RiskFlow実行
- * 
+ *
  * MapContainerを薄くするための整理層
  -------------------------------------------------*/
 export function useLocationController(
@@ -144,21 +144,25 @@ export function useLocationController(
   // }, [getCurrentLocation, runRiskFlow, mapRef]);
 
   /**----------------------------------
-   * Geocoder
+   * Geocoder (Promise化)
    ----------------------------------*/
-  const geocodeAddress = (address: string) =>
-    new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
-      try {
-        const geocoder = new google.maps.Geocoder();
+  const geocodeAddress = async (
+    address: string
+  ): Promise<google.maps.GeocoderResult[]> => {
+    if (!address.trim()) return [];
 
-        geocoder.geocode({ address }, (results, status) => {
-          if (status === "OK" && results) resolve(results);
-          else reject(new Error(status));
-        });
-      } catch (err) {
-        reject(err);
-      }
-    });
+    const geocoder = new google.maps.Geocoder();
+
+    try {
+      // Promise形式で直接awaitできる
+      const { results } = await geocoder.geocode({ address });
+
+      return results ?? [];
+    } catch (err) {
+      console.error("[geocodeAddress]", err);
+      throw err;
+    }
+  };
 
   //   const geocodeAddress = (address: string) =>
   //     new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
