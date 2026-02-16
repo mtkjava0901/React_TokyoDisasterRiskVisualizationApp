@@ -2,9 +2,13 @@ import { useAtom } from "jotai";
 import { mapCenterAtom, mapZoomAtom } from "../atoms/mapAtom";
 import { mapBoundsAtom } from "../atoms/mapBoundsAtom";
 import { RefObject, useCallback } from "react";
+import { useMapController } from "./map/useMapController";
 
 /**---------------------------------------------
  * Mapのイベントをstateに反映するカスタムフック
+ * 処理順：
+ * Map ⇒ Controller ⇒ atom (一方向同期)
+ *
  * ・onIdle
  * ・onBoundsChanged
  * ・onZoomChanged
@@ -19,8 +23,11 @@ type UseMapEventSyncProps = {
 };
 
 export default function useMapEventSync({ mapRef }: UseMapEventSyncProps) {
-  const [, setCenter] = useAtom(mapCenterAtom);
-  const [, setZoom] = useAtom(mapZoomAtom);
+  // Controller経由
+  const { updateCenter, updateZoom } = useMapController();
+  // const [, setCenter] = useAtom(mapCenterAtom);
+  // const [, setZoom] = useAtom(mapZoomAtom);
+
   const [, setBounds] = useAtom(mapBoundsAtom);
 
   // onIdle=今の地図状態が確定した瞬間に呼ばれる
@@ -40,21 +47,30 @@ export default function useMapEventSync({ mapRef }: UseMapEventSyncProps) {
     if (zoom == null) return;
     if (!bounds) return;
 
-    // centerをatomに反映(差分チェック付き)
-    const nextCenter = {
+    // Center ⇒ Controller
+    updateCenter({
       lat: center.lat(),
       lng: center.lng()
-    };
+    });
+
+    // zoom ⇒ Controller
+    updateZoom(zoom);
+
+    // centerをatomに反映(差分チェック付き)
+    // const nextCenter = {
+    //   lat: center.lat(),
+    //   lng: center.lng()
+    // };
 
     // Map中央値セット
-    setCenter((prev) =>
-      !prev || prev.lat !== nextCenter.lat || prev.lng !== nextCenter.lng
-        ? nextCenter
-        : prev
-    );
+    // setCenter((prev) =>
+    //   !prev || prev.lat !== nextCenter.lat || prev.lng !== nextCenter.lng
+    //     ? nextCenter
+    //     : prev
+    // );
 
     // zoom値セット、差分チェック(値が同じなら更新しない)
-    setZoom((prev) => (prev === zoom ? prev : zoom));
+    // setZoom((prev) => (prev === zoom ? prev : zoom));
 
     // boundsをatomに反映
     const ne = bounds.getNorthEast();
@@ -80,7 +96,7 @@ export default function useMapEventSync({ mapRef }: UseMapEventSyncProps) {
         ? prev
         : nextBounds;
     });
-  }, [mapRef, setCenter, setZoom, setBounds]);
+  }, [mapRef, updateCenter, updateZoom, setBounds]);
 
   // GoogleMapに渡すイベントハンドラ
   return { onIdle };

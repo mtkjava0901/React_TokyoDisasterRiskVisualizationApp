@@ -17,7 +17,7 @@ type MapViewProps = {
   // GoogleMapが初期化された瞬間(保持しない)
   onLoad?: (map: google.maps.Map) => void;
   // ユーザー操作終了時(状態同期の入り口)
-  onIdle: () => void;
+  onIdle?: () => void;
   // 地図の上に乗せるもの(Marker/Polygon/OverlayView/災害レイヤー等)
   children?: ReactNode;
 };
@@ -32,6 +32,13 @@ export default function MapView({
 }: MapViewProps) {
   console.log("MapView children:", children);
 
+  const mapOptions = {
+    zoomControl: false,
+    streetViewControl: false,
+    mapTypeControl: false,
+    fullscreenControl: false
+  };
+
   return (
     <div className="map-container">
       <GoogleMap
@@ -41,12 +48,13 @@ export default function MapView({
         onClick={onClick}
         onLoad={onLoad}
         onIdle={onIdle}
-        options={{
-          zoomControl: false,
-          streetViewControl: false,
-          mapTypeControl: false,
-          fullscreenControl: false
-        }}
+        options={mapOptions}
+        // options={{
+        //   zoomControl: false,
+        //   streetViewControl: false,
+        //   mapTypeControl: false,
+        //   fullscreenControl: false
+        // }}
       >
         {children}
       </GoogleMap>

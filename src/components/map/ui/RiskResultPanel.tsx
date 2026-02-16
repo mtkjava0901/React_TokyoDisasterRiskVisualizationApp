@@ -20,7 +20,7 @@ export default function RiskResultPanel() {
         zIndex: 999
       }}
     >
-      <h3>リスク情報</h3>
+      <h3>選択地点の災害リスク</h3>
 
       {ui.loading && <p>取得中...</p>}
 

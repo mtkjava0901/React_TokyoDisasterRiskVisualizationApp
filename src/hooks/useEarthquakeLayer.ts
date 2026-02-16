@@ -25,6 +25,8 @@ const meshLevelValueMap: Record<MeshLevel, number | null> = {
  * ・map状態監視
  * ・layer API取得
  * ・atom保存
+ *
+ * ※未使用予定
  ------------------------------*/
 export function useEarthquakeLayer() {
   const bounds = useAtomValue(mapBoundsAtom);

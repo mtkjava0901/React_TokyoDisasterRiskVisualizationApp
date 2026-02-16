@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { fetchEarthquakeLayer } from "../../api/earthquakeLayerApi";
 import { mapBoundsAtom } from "../../atoms/mapBoundsAtom";
 import { earthquakeDataAtom } from "../../atoms/earthquakeDataAtom";
@@ -8,14 +8,19 @@ import { MeshLevel, resolveZoomRule } from "../../domain/map/zoomRule";
 import { mapZoomAtom } from "../../atoms/mapAtom";
 
 /**--------------------------------------------------------------
- * MapBoundsAtom(Mapの表示範囲)を監視
- * ⇒activeLayerAtomがearthquakeの時だけ動く(APIの取得)
- * 結果を別のatomに格納する
- * 役割：デバウンス / ガード制御
- * ⇒描画しない・UIを返さない。副作用のために存在するcomponent
- * 『今の地図状態をどう解釈して、何を取得するか』
+ * Earthquakeデータ司令塔
+ * 責務：
+ * ・Map状態監視(bounds/zoom/layer)
+ * ・自動データ取得
+ * ・取得頻度制御
+ * ・重複fetch防止
  *
- * ※削除予定
+ * 旧EarthquakeDataControllerからの追加項目：
+ * ・debounce（UX+API保護）
+ * ・同条件fetch防止
+ * ・fetch中の再実行防止
+ *
+ * ※後に実装予定？
 -------------------------------------------------------------- */
 
 /**--------------------------------------------------------------
@@ -29,19 +34,20 @@ const meshLevelValueMap: Record<MeshLevel, number | null> = {
 };
 
 export default function EarthquakeDataController() {
-  // 今地図に表示されている範囲
   const [bounds] = useAtom(mapBoundsAtom);
-  // 現在のズームレベル
   const [zoom] = useAtom(mapZoomAtom);
-  // 今有効なレイヤー(earthquake/flood)
   const [activeLayer] = useAtom(activeLayerAtom);
-  // 取得した地震データの保存先
   const [, setEarthquakes] = useAtom(earthquakeDataAtom);
+
+  // 内部制御用
+  const lastFetchKeyRef = useRef<string | null>(null);
+  const isFetchingRef = useRef(false);
 
   // 地図状態or表示モードの変更で再判定(useEffect)
   useEffect(() => {
     // bounds(境界)が無い場合はそのまま返す
     if (!bounds) return;
+    console.log("bounds =", bounds);
 
     // earthquakeレイヤー以外では動かない
     if (activeLayer !== "earthquake") {
@@ -58,6 +64,7 @@ export default function EarthquakeDataController() {
     }
 
     const meshValue = meshLevelValueMap[rule.meshLevel];
+
     // meshなし = 表示無し
     if (meshValue === null) {
       setEarthquakes([]);
@@ -65,20 +72,33 @@ export default function EarthquakeDataController() {
     }
 
     /**-------------------------------------------------
-     * 現在の地図範囲・ズームを使い、地震データAPIを呼び出す
-     * 取得結果を"earthquakeDataAtom"に保存
-     * それを描画コンポーネント側が勝手に使う
-     -------------------------------------------------*/
-    const fetch = async () => {
-      // meshValueがnullの場合取得不要
-      if (meshValue === null) {
-        console.log("[EDC] meshLevel NONE, fetch skipped");
-        setEarthquakes([]);
-        return;
-      }
+ * fetch条件キー生成
+ * 同条件なら再取得しない
+ -------------------------------------------------*/
+    const fetchKey = [
+      bounds.minLat.toFixed(8),
+      bounds.maxLat.toFixed(8),
+      bounds.minLng.toFixed(8),
+      bounds.maxLng.toFixed(8),
+      zoom,
+      activeLayer,
+      meshValue
+    ].join("-");
+
+    // 同条件ならskip
+    if (lastFetchKeyRef.current === fetchKey) return;
+
+    // fetch中ならskip
+    if (isFetchingRef.current) return;
+
+    /** -------------------------
+     * debounce（ドラッグ中連打防止）
+     * -------------------------*/
+    const timer = setTimeout(async () => {
+      lastFetchKeyRef.current = fetchKey;
+      isFetchingRef.current = true;
 
       try {
-        // fetchEarthquakeLayerのmeshLevel引数はnumber型に変更済み
         const data = await fetchEarthquakeLayer(
           bounds.minLat,
           bounds.maxLat,
@@ -87,19 +107,51 @@ export default function EarthquakeDataController() {
           meshValue
         );
 
-        // 取得結果を保存
         setEarthquakes(data);
       } catch (err) {
         console.error("[EDC] fetchEarthquakeLayer error", err);
-        setEarthquakes([]); // エラー時は空配列
+        setEarthquakes([]);
+      } finally {
+        isFetchingRef.current = false;
       }
-    };
+    }, 350); // 300～500ms
 
-    // [bounds, zoom, activeLayer]が変更される度に条件チェック
-    // OKなら地震データを再取得
-    fetch();
+    return () => clearTimeout(timer);
   }, [bounds, zoom, activeLayer, setEarthquakes]);
 
-  // 画面には何も表示しない(このcomponentの役割)
   return null;
 }
+
+//   const fetch = async () => {
+//     // meshValueがnullの場合取得不要
+//     if (meshValue === null) {
+//       console.log("[EDC] meshLevel NONE, fetch skipped");
+//       setEarthquakes([]);
+//       return;
+//     }
+
+//     try {
+//       // fetchEarthquakeLayerのmeshLevel引数はnumber型に変更済み
+//       const data = await fetchEarthquakeLayer(
+//         bounds.minLat,
+//         bounds.maxLat,
+//         bounds.minLng,
+//         bounds.maxLng,
+//         meshValue
+//       );
+
+//       // 取得結果を保存
+//       setEarthquakes(data);
+//     } catch (err) {
+//       console.error("[EDC] fetchEarthquakeLayer error", err);
+//       setEarthquakes([]); // エラー時は空配列
+//     }
+//   };
+
+//   // [bounds, zoom, activeLayer]が変更される度に条件チェック
+//   // OKなら地震データを再取得
+//   fetch();
+// }, [bounds, zoom, activeLayer, setEarthquakes]);
+
+// // 画面には何も表示しない(このcomponentの役割)
+// return null;
