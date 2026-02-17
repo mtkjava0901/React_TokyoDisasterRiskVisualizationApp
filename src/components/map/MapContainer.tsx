@@ -19,7 +19,7 @@ import { useLocationController } from "@/hooks/location/useLocationController";
 import { useMapController } from "@/hooks/map/useMapController";
 import EarthquakeDataController from "../controller/EarthquakeDataController";
 import { useAutoRiskController } from "@/hooks/risk/useAutoRiskController";
-import CrosshairUI from "@/components/map/ui/CrossHairUI";
+import CrosshairUI from "@/components/map/ui/CrosshairUI";
 import { useRiskLocationController } from "@/hooks/risk/useRiskLocationController";
 
 const LIBRARIES: "geometry"[] = ["geometry"];
@@ -64,8 +64,8 @@ export default function MapContainer() {
   useSyncMeshLevel();
   // 地震レイヤー取得
   useEarthquakeLayer();
-  // Map中心地リスク取得(0216停止)
-  // useAutoRiskController();
+  // Map中心地リスク取得
+  useAutoRiskController();
   //
   useRiskLocationController();
 

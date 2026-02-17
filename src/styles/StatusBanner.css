@@ -1,9 +1,44 @@
 /* ステータスバナー用CSS */
 
+/* 共通 */
 .tokyo-banner {
-  /* position: absolute; */
   position: fixed;
-  top: 55px; /* header見ながら調整 */
+  top: 55px;
+  left: 0;
+  right: 0;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 1000;
+}
+
+/* 赤 */
+.tokyo-banner.outside {
+  background: #dc143c;
+  color: white;
+}
+
+/* 黄 */
+.tokyo-banner.boundary {
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* エラー */
+.tokyo-banner.error {
+  background: #721c24;
+  color: white;
+}
+
+/* 旧 */
+/* .tokyo-banner {
+  position: fixed;
+  top: 55px;
   left: 0;
   right: 0;
 
@@ -19,4 +54,4 @@
   font-weight: 600;
 
   z-index: 1000;
-}
+} */

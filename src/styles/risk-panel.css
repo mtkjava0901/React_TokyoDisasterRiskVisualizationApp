@@ -5,8 +5,9 @@
   position: fixed;
 
   /* header + banner考慮 */
-  top: 72px;
-  right: 12px;
+  /* top: 72px; */
+  top: 85px;
+  right: 0px;
 
   width: 260px;
   padding: 14px;

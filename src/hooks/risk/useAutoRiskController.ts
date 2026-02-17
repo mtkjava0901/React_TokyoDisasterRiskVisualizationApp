@@ -11,12 +11,12 @@ import { useMapController } from "@/hooks/map/useMapController";
  * ・mapCenter変更監視
  * ・debounce付きrisk取得
  * ・重複API防止
- * ・東京都外なら最近接へ自動移動
+ * ・遷移を行わない(LocationControllerのみ)
 --------------------------------------------------*/
 export function useAutoRiskController() {
   const center = useAtomValue(mapCenterAtom);
   const { runRiskFlow } = useRiskFlow();
-  const { moveMap } = useMapController(); //2016追記
+  // const { moveMap } = useMapController(); //2017停止
 
   // 同一点再取得防止
   const lastKeyRef = useRef<string | null>(null);
@@ -38,19 +38,18 @@ export function useAutoRiskController() {
       lastKeyRef.current = key;
 
       try {
-        const flow = await runRiskFlow(center.lat, center.lng);
+        // const flow = await runRiskFlow(center.lat, center.lng);
+        await runRiskFlow(center.lat, center.lng);
+        // 東京都外なら最近接へ移動(0217停止)
+        //if (!flow.isTokyo && flow.nearestPoint) {
+        //  console.log("[AutoRisk] move nearest Tokyo");
 
-        // 東京都外なら最近接へ移動
-        if (!flow.isTokyo && flow.nearestPoint) {
-          console.log("[AutoRisk] move nearest Tokyo");
+        // mapController経由で移動(0216停止)
+        // const { useMapController } =
+        //   await import("@/hooks/map/useMapController");
+        // const { moveMap } = useMapController();
 
-          // mapController経由で移動(0216停止)
-          // const { useMapController } =
-          //   await import("@/hooks/map/useMapController");
-          // const { moveMap } = useMapController();
-
-          moveMap(flow.nearestPoint, 13);
-        }
+        // moveMap(flow.nearestPoint, 13);
       } catch (err) {
         console.error("[AutoRiskController]", err);
       }
