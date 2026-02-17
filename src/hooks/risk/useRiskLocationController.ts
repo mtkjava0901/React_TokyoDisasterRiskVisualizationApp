@@ -10,6 +10,8 @@ import {
 
 import { RiskLocationStatus } from "@/domain/risk/riskLocationStatus";
 
+// ※削除予定
+
 /**---------------------------------------
  * 境界距離しきい値（500m）
  ---------------------------------------*/

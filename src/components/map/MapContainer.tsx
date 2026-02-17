@@ -21,6 +21,9 @@ import EarthquakeDataController from "../controller/EarthquakeDataController";
 import { useAutoRiskController } from "@/hooks/risk/useAutoRiskController";
 import CrosshairUI from "@/components/map/ui/CrosshairUI";
 import { useRiskLocationController } from "@/hooks/risk/useRiskLocationController";
+import OutsideTokyoConfirm from "./ui/OutsideTokyoConfirm";
+import Banner from "./ui/banner/Bannner";
+import BannerController from "./ui/banner/BannerController";
 
 const LIBRARIES: "geometry"[] = ["geometry"];
 
@@ -99,7 +102,9 @@ export default function MapContainer() {
 
       <RiskResultPanel />
 
-      <TokyoStatusBanner />
+      {/* <TokyoStatusBanner /> */}
+      <Banner />
+      <BannerController />
       <LegendUI />
       <FooterUI />
 

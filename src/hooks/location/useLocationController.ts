@@ -3,6 +3,9 @@ import { useRiskFlow } from "../useRiskFlow";
 import { useCurrentLocation } from "./useCurrentLocation";
 import { useMapController } from "../map/useMapController";
 import useGeocoding from "../useGeocoding";
+import { useSetAtom } from "jotai";
+import { locationTriggerAtom } from "@/atoms/locationTriggerAtom";
+import { bannerAtom } from "@/atoms/bannerAtom";
 
 /**-------------------------------------------------
  * Location統合Controller
@@ -34,6 +37,11 @@ export function useLocationController() {
   // 住所 ⇒ 座標変換
   const { geocode } = useGeocoding();
 
+  // trigger保存
+  const setTrigger = useSetAtom(locationTriggerAtom);
+  // Banner制御
+  const showBanner = useSetAtom(bannerAtom);
+
   /**----------------------------------
   * 共通フロー：
   * ・Map移動
@@ -51,38 +59,74 @@ export function useLocationController() {
       try {
         console.log("[runLocationFlow]", { lat, lng, trigger });
 
-        // Map移動 + Risk並列
-        const [_, flow] = await Promise.all([
-          Promise.resolve(moveMap({ lat, lng }, zoom)),
-          runRiskFlow(lat, lng)
-        ]);
-
-        // 東京都外なら最近接へ(0216停止)
-        // if (!flow.isTokyo && flow.nearestPoint) {
-        //   moveMap(flow.nearestPoint, zoom);
-        // }
+        // risk判定
+        const flow = await runRiskFlow(lat, lng);
         if (!flow) return null;
 
-        // trigger別挙動
-        switch (trigger) {
-          // 住所検索 ⇒ 都外なら補正
-          case "ADDRESS_SEARCH":
-            if (!flow.isTokyo && flow.nearestPoint) {
-              console.log("[Location] outside ⇒ move nearest Tokyo");
-              moveMap(flow.nearestPoint, zoom);
-            }
-            break;
+        setTrigger(trigger);
 
-          // 現在地 ⇒ 補正しない
-          case "CURRENT_LOCATION":
-            // 状態だけOUTSIDE表示
-            break;
-
-          // Mapクリック ⇒ 補正しない
-          case "MAP_CLICK":
-            // 状態だけOUTSIDE表示
-            break;
+        if (trigger === "ADDRESS_SEARCH") {
+          moveMap({ lat, lng }, zoom);
         }
+        /**------------------
+       * 住所検索 → confirm
+       ------------------*/
+        if (
+          trigger === "ADDRESS_SEARCH" &&
+          !flow.isTokyo &&
+          flow.nearestPoint
+        ) {
+          showBanner({
+            visible: true,
+            type: "confirm",
+            message:
+              "⚠この地点は東京都外です。最も近い東京都境界へ移動しますか？",
+            confirmLabel: "移動する",
+            cancelLabel: "このまま表示",
+
+            onConfirm: () => {
+              moveMap(flow.nearestPoint!, zoom);
+            }
+          });
+
+          // 移動しない
+          return flow;
+        }
+
+        /**------------------
+       * 地図クリック / 現在地
+       ------------------*/
+        if (
+          (trigger === "MAP_CLICK" || trigger === "CURRENT_LOCATION") &&
+          !flow.isTokyo
+        ) {
+          showBanner({
+            visible: true,
+            type: "outside",
+            message: "⚠この地点は東京都外のため、情報を表示できません。",
+            duration: 4000
+          });
+
+          // 移動しない
+          return flow;
+        }
+
+        /** -------------------------
+       * 境界付近
+       ------------------------- */
+        if (flow.isBoundary) {
+          showBanner({
+            visible: true,
+            type: "boundary",
+            message: "⚠東京都の境界付近です。",
+            duration: 2500
+          });
+        }
+
+        /** -------------------------
+       * 都内 or 境界 → 移動
+       ------------------------- */
+        moveMap({ lat, lng }, zoom);
 
         return flow;
       } catch (err) {
@@ -90,8 +134,74 @@ export function useLocationController() {
         return null;
       }
     },
-    [moveMap, runRiskFlow]
+    [moveMap, runRiskFlow, setTrigger, showBanner]
   );
+
+  //       if (!flow.isTokyo) {
+  //         showBanner({
+  //           visible: true,
+  //           type: "outside",
+  //           message: "⚠この地点は東京都外のため、情報を表示できません。",
+  //           duration: 4000
+  //         });
+  //       }
+
+  //       return flow;
+
+  //     } catch (err) {
+  //       console.error("[runLocationFlow]", err);
+  //       return null;
+  //     }
+  //   },
+  //   [moveMap, runRiskFlow, setTrigger, showBanner]
+  // );
+
+  //     try {
+  //       console.log("[runLocationFlow]", { lat, lng, trigger });
+
+  //       // Map移動 + Risk並列
+  //       const [_, flow] = await Promise.all([
+  //         Promise.resolve(moveMap({ lat, lng }, zoom)),
+  //         runRiskFlow(lat, lng)
+  //       ]);
+
+  //       if (!flow) return null;
+
+  //       // 0217追加
+  //       setTrigger(trigger);
+
+  //       // trigger別挙動
+  //       switch (trigger) {
+  //         // 住所検索 ⇒ 都外ならConfirm表示
+  //         case "ADDRESS_SEARCH":
+  //           if (!flow.isTokyo) {
+  //             showBanner({
+  //               visible: true,
+  //               type: "warning",
+  //               message: "東京都外のためリスク情報を表示できません",
+  //               duration: 4000
+  //             });
+  //           }
+
+  //         // 現在地 ⇒ 補正しない
+  //         case "CURRENT_LOCATION":
+  //           // 状態だけOUTSIDE表示
+  //           break;
+
+  //         // Mapクリック ⇒ 補正しない
+  //         case "MAP_CLICK":
+  //           // 状態だけOUTSIDE表示
+  //           break;
+  //       }
+
+  //       return flow;
+  //     } catch (err) {
+  //       console.error("[runLocationFlow]", err);
+  //       return null;
+  //     }
+  //   },
+  //   [moveMap, runRiskFlow]
+  // );
 
   /**----------------------------------
   * 現在地へ移動
