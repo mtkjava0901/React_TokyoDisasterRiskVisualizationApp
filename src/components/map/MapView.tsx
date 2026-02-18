@@ -1,4 +1,4 @@
-import { GoogleMap, Polygon } from "@react-google-maps/api";
+import { GoogleMap } from "@react-google-maps/api";
 import { ReactNode } from "react";
 /**------------------------------------------------------------------
  * GoogleMapコンポーネント
@@ -49,12 +49,6 @@ export default function MapView({
         onLoad={onLoad}
         onIdle={onIdle}
         options={mapOptions}
-        // options={{
-        //   zoomControl: false,
-        //   streetViewControl: false,
-        //   mapTypeControl: false,
-        //   fullscreenControl: false
-        // }}
       >
         {children}
       </GoogleMap>

@@ -3,7 +3,6 @@ import MapView from "./MapView";
 import EarthquakePolygonLayer from "./layers/earthquake/EarthquakePolygonLayer";
 import LegendUI from "./ui/LegendUI";
 import FooterUI from "./ui/FooterUI";
-import TokyoStatusBanner from "./ui/TokyoStatusBanner";
 import RiskResultPanel from "./ui/RiskResultPanel";
 
 import useMapEventSync from "@/hooks/useMapEventSync";
@@ -11,19 +10,16 @@ import { useEarthquakeLayer } from "@/hooks/useEarthquakeLayer";
 import { useSyncMeshLevel } from "@/hooks/useSyncMeshLevel";
 
 import { useRef } from "react";
-import { useAtomValue } from "jotai";
-import { mapCenterAtom, mapZoomAtom } from "@/atoms/mapAtom";
 
-import LocationTest from "../debug/LocationTest";
 import { useLocationController } from "@/hooks/location/useLocationController";
 import { useMapController } from "@/hooks/map/useMapController";
 import EarthquakeDataController from "../controller/EarthquakeDataController";
 import { useAutoRiskController } from "@/hooks/risk/useAutoRiskController";
 import CrosshairUI from "@/components/map/ui/CrosshairUI";
 import { useRiskLocationController } from "@/hooks/risk/useRiskLocationController";
-import OutsideTokyoConfirm from "./ui/OutsideTokyoConfirm";
 import Banner from "./ui/banner/Bannner";
 import BannerController from "./ui/banner/BannerController";
+import { useInitializeLocation } from "@/hooks/useInitializeLocation";
 
 const LIBRARIES: "geometry"[] = ["geometry"];
 
@@ -47,6 +43,7 @@ export default function MapContainer() {
   // GoogleMapsAPIロード
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    language: "ja",
     libraries: LIBRARIES
   });
 
@@ -71,6 +68,8 @@ export default function MapContainer() {
   useAutoRiskController();
   //
   useRiskLocationController();
+  // 初回時に1回だけ動かす
+  useInitializeLocation();
 
   /**--------------------------------------
    * Location操作（クリック・現在地・住所検索）

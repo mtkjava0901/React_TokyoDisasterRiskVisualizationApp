@@ -1,8 +1,11 @@
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { mapCenterAtom, mapZoomAtom } from "../atoms/mapAtom";
 import { mapBoundsAtom } from "../atoms/mapBoundsAtom";
-import { RefObject, useCallback } from "react";
+import { RefObject, useCallback, useEffect } from "react";
 import { useMapController } from "./map/useMapController";
+import { locationTriggerAtom } from "@/atoms/locationTriggerAtom";
+import { locationAtom } from "@/atoms/locationAtom";
 
 /**---------------------------------------------
  * Mapのイベントをstateに反映するカスタムフック
@@ -15,6 +18,9 @@ import { useMapController } from "./map/useMapController";
  * 「Map ⇒ atom」の一方向同期
  * -GoogleMapの「事実」をatomに流すだけ
  * -解釈(zoom→MeshLevel等)は一切しない
+ *
+ * Map中央 ⇒ LocationAtom同期追加
+ * Map移動 ＝ MAP_CLICK扱い
 --------------------------------------------- */
 // props用の型を定義
 type UseMapEventSyncProps = {
@@ -23,15 +29,24 @@ type UseMapEventSyncProps = {
 };
 
 export default function useMapEventSync({ mapRef }: UseMapEventSyncProps) {
-  // Controller経由
   const { updateCenter, updateZoom } = useMapController();
-  // const [, setCenter] = useAtom(mapCenterAtom);
-  // const [, setZoom] = useAtom(mapZoomAtom);
-
   const [, setBounds] = useAtom(mapBoundsAtom);
 
-  // onIdle=今の地図状態が確定した瞬間に呼ばれる
+  const setLocation = useSetAtom(locationAtom);
+  const setTrigger = useSetAtom(locationTriggerAtom);
+  const location = useAtomValue(locationAtom);
+
+  console.log("MapEventSync locationAtom", locationAtom);
+
+  // location監視ログ
+  useEffect(() => {
+    console.log("📍 locationAtom changed:", location);
+  }, [location]);
+
+  // MAP状態確定時
   const onIdle = useCallback(() => {
+    // console.log("onIdle fired");
+
     // mapが無ければ何もしない
     if (!mapRef.current) return;
 
@@ -43,36 +58,27 @@ export default function useMapEventSync({ mapRef }: UseMapEventSyncProps) {
 
     // 取得失敗時のガード
     // getCenterがnull/getZoomがundefined(未定義)/bounds(境界)未確定
-    if (!center) return;
-    if (zoom == null) return;
-    if (!bounds) return;
+    if (!center || zoom == null || !bounds) return;
 
-    // Center ⇒ Controller
-    updateCenter({
-      lat: center.lat(),
-      lng: center.lng()
-    });
+    const lat = center.lat();
+    const lng = center.lng();
 
-    // zoom ⇒ Controller
+    // Map ⇒ Controller
+    updateCenter({ lat, lng });
     updateZoom(zoom);
 
-    // centerをatomに反映(差分チェック付き)
-    // const nextCenter = {
-    //   lat: center.lat(),
-    //   lng: center.lng()
-    // };
+    // 2/18追加
+    // 差分チェック
+    const locationChanged =
+      !location || location.lat !== lat || location.lng !== lng;
 
-    // Map中央値セット
-    // setCenter((prev) =>
-    //   !prev || prev.lat !== nextCenter.lat || prev.lng !== nextCenter.lng
-    //     ? nextCenter
-    //     : prev
-    // );
+    if (locationChanged) {
+      console.log("MAP_CLICK fired", { lat, lng });
+      setLocation({ lat, lng });
+      setTrigger("MAP_CLICK");
+    }
 
-    // zoom値セット、差分チェック(値が同じなら更新しない)
-    // setZoom((prev) => (prev === zoom ? prev : zoom));
-
-    // boundsをatomに反映
+    // boundsをatomに同期
     const ne = bounds.getNorthEast();
     const sw = bounds.getSouthWest();
 
@@ -96,7 +102,7 @@ export default function useMapEventSync({ mapRef }: UseMapEventSyncProps) {
         ? prev
         : nextBounds;
     });
-  }, [mapRef, updateCenter, updateZoom, setBounds]);
+  }, [mapRef, updateCenter, updateZoom, setBounds, setLocation, setTrigger]);
 
   // GoogleMapに渡すイベントハンドラ
   return { onIdle };
