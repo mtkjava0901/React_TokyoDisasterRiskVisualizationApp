@@ -8,6 +8,12 @@ import { useLocationController } from "@/hooks/location/useLocationController";
 
 /**-------------------------
  * Headerパーツ
+ *
+ * ボタン順: [地図][地震][洪水][ReadMe]
+ * ・[地図]: 全レイヤー非表示
+ * ・[地震]: 地震レイヤーに切り替え（Switch）
+ * ・[洪水]: 洪水レイヤーに切り替え（Switch）
+ * ・同じボタンを2回押してもレイヤーは消えない（[地図]で解除）
  -------------------------*/
 export default function Header() {
   const [activeLayer, setActiveLayer] = useAtom(activeLayerAtom);
@@ -17,14 +23,19 @@ export default function Header() {
   // Location操作
   const { searchAddress, moveToCurrentLocation } = useLocationController();
 
-  // Layer toggle Earthquake
-  const toggleEarthquake = () => {
-    setActiveLayer((prev) => (prev === "earthquake" ? null : "earthquake"));
+  // [地図] ボタン: 全レイヤー非表示
+  const handleMapLayer = () => {
+    setActiveLayer("map");
   };
 
-  // Layer toggle Flood
-  const toggleFlood = () => {
-    setActiveLayer((prev) => (prev === "flood" ? null : "flood"));
+  // [地震] ボタン: 地震レイヤーに切り替え（既に選択中でも変化なし）
+  const handleEarthquake = () => {
+    setActiveLayer("earthquake");
+  };
+
+  // [洪水] ボタン: 洪水レイヤーに切り替え（既に選択中でも変化なし）
+  const handleFlood = () => {
+    setActiveLayer("flood");
   };
 
   // 住所検索
@@ -72,18 +83,25 @@ export default function Header() {
       {/* 中央 */}
       <div className="header-center">東京都災害リスク可視化アプリ</div>
 
-      {/* 右 */}
+      {/* 右: [地図][地震][洪水][ReadMe] */}
       <div className="header-right">
         <button
+          className={`layer-button ${activeLayer === "map" ? "active" : ""}`}
+          onClick={handleMapLayer}
+        >
+          地図
+        </button>
+
+        <button
           className={`layer-button ${activeLayer === "earthquake" ? "active" : ""}`}
-          onClick={toggleEarthquake}
+          onClick={handleEarthquake}
         >
           地震
         </button>
 
         <button
           className={`layer-button ${activeLayer === "flood" ? "active" : ""}`}
-          onClick={toggleFlood}
+          onClick={handleFlood}
         >
           洪水
         </button>

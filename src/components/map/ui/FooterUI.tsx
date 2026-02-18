@@ -7,7 +7,7 @@ import { activeLayerAtom } from "../../../atoms/activeLayerAtom";
 export default function FooterUI() {
   const activeLayer = useAtomValue(activeLayerAtom);
 
-  if (!activeLayer) return null;
+  if (activeLayer === "map") return null;
 
   const sourceText =
     activeLayer === "earthquake"

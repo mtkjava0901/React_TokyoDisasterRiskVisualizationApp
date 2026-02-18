@@ -10,7 +10,7 @@ import { LEGEND_CONFIG } from "@/components/map/ui/legendConfig";
 export default function LegendUI() {
   const activeLayer = useAtomValue(activeLayerAtom);
 
-  if (!activeLayer) return null;
+  if (activeLayer === "map") return null;
 
   const config = LEGEND_CONFIG[activeLayer];
   if (!config) return null;

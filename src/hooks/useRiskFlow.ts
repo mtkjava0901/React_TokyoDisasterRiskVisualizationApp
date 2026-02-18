@@ -8,28 +8,21 @@ import { fetchNearestBoundary } from "@/api/boundaryApi";
 import { areaModeAtom } from "@/atoms/areaModeAtom";
 import { tokyoStatusAtom } from "@/atoms/tokyoStatusAtom";
 import { useReverseGeocode } from "@/hooks/useReverseGeocode";
-import { bannerAtom } from "@/atoms/bannerAtom";
+// bannerAtomはController側で制御するためimport不要
 
 /**----------------------------------------
  * 順制御hook（オーケストレーションhook）
  * A-05(東京都内判定)
  * ⇒A-03(地震リスク判定)
- * ⇒A-04(洪水リスク) ※後に追加、単一リスク⇒マルチリスク統合フローに進化
+ * ⇒A-04(洪水リスク)
  * ⇒A-06(最近接東京都境界取得)
  *
  * 役割：
  * ・処理順保障
  * ・UI状態管理
  * ・エラー制御
- * ・将来のAPI追加ポイント
  *
- * 後のメモ：
- * ・Flowは一つにまとめる(runRiskFlow())
- * ・runRiskFlow()⇒A-05⇒Promise.all(A03,A-04)⇒結果統合⇒UI更新
- * ・Map責務
- *      1.表示範囲⇒レイヤー取得
- *      2.クリック⇒リスクフロー
- *      3.UI表示
+ * バナー表示はController側（useLocationController / useAutoRiskController）で行う
  ----------------------------------------*/
 export type RiskFlowResult = {
   result: any | null;
@@ -46,7 +39,6 @@ export function useRiskFlow() {
   const [, setResult] = useAtom(riskResultAtom);
   const [, setAreaMode] = useAtom(areaModeAtom);
   const setTokyoStatus = useSetAtom(tokyoStatusAtom);
-  const setBanner = useSetAtom(bannerAtom);
 
   // 境界判定しきい値（30～50m推奨）
   const BOUNDARY_THRESHOLD = 50;
@@ -69,9 +61,8 @@ export function useRiskFlow() {
 
       // A-05 東京都内判定
       const tokyoCheck = await checkTokyoContains(point.lat, point.lng);
-      // console.log("[RiskFlow] tokyoCheck:", tokyoCheck);
 
-      // 都外 ⇒ 即終了(BOUNDARY見ない)
+      // ■ 都外
       if (!tokyoCheck.isTokyo) {
         console.log("[RiskFlow] OUTSIDE_TOKYO");
 
@@ -79,46 +70,22 @@ export function useRiskFlow() {
         setAreaMode("OUTSIDE_TOKYO");
         setUi({ loading: false, error: null });
 
-        // 2/18追記
-        setBanner({
-          visible: true,
-          type: "confirm",
-          message: "東京都外です。境界まで移動しますか？",
-          confirmLabel: "移動する",
-          cancelLabel: "このまま表示",
+        // 最近接点を取得して返す（バナー制御はController側で行う）
+        let nearestPoint: { lat: number; lng: number } | undefined;
+        try {
+          const nearest = await fetchNearestBoundary(point.lat, point.lng);
+          nearestPoint = nearest?.nearestPoint;
+        } catch {
+          // 取得失敗は無視
+        }
 
-          onConfirm: async () => {
-            try {
-              const nearest = await fetchNearestBoundary(point.lat, point.lng);
-
-              if (nearest?.nearestPoint) {
-                console.log("move to boundary:", nearest.nearestPoint);
-
-                // map移動用stateがあるならここで更新
-                // 例:
-                // setLocation(nearest.nearestPoint);
-              }
-            } catch (e) {
-              console.error("boundary move error", e);
-            }
-          }
-        });
-
-        return {
-          result: null,
-          isTokyo: false,
-          isBoundary: false
-        };
+        return { result: null, isTokyo: false, isBoundary: false, nearestPoint };
       }
 
-      // 都内 ⇒ BOUNDARY判定
+      // ■ 都内: 境界距離判定
       const nearest = await fetchNearestBoundary(point.lat, point.lng);
       const distance = nearest.distanceMeter ?? Infinity;
       const isBoundary = distance < BOUNDARY_THRESHOLD;
-
-      // console.log("[RiskFlow] nearest boundary raw:", nearest);
-      // console.log("[RiskFlow] distance:", distance);
-      // console.log("[RiskFlow] isBoundary:", isBoundary);
 
       if (isBoundary) {
         setTokyoStatus("BOUNDARY");
@@ -133,8 +100,6 @@ export function useRiskFlow() {
         fetchRisk(point.lat, point.lng),
         getAddress(point.lat, point.lng)
       ]);
-      // const result = await fetchRisk(point.lat, point.lng);
-      // if (!result) throw new Error("Risk fetch failed");
 
       // 結果統合
       setResult({

@@ -1,74 +1,74 @@
 import { useEffect, useRef } from "react";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useRiskFlow } from "@/hooks/useRiskFlow";
 import { locationAtom } from "@/atoms/locationAtom";
-import { useMapController } from "@/hooks/map/useMapController";
-import { mapCenterAtom } from "@/atoms/mapAtom";
+import { locationTriggerAtom } from "@/atoms/locationTriggerAtom";
+import { bannerAtom } from "@/atoms/bannerAtom";
 
 /**--------------------------------------------------
  * Map中央のリスク自動取得Controller
  *
- * 役割：
- * ・mapCenter変更監視
+ * ・locationAtom監視
  * ・debounce付きrisk取得
- * ・重複API防止
- * ・遷移を行わない(LocationControllerのみ)
  *
- * 2/18 locationAtom監視に修正
+ * バナー制御は BannerController に一本化。
 --------------------------------------------------*/
 export function useAutoRiskController() {
   const location = useAtomValue(locationAtom);
   const { runRiskFlow } = useRiskFlow();
-
   const lastKeyRef = useRef<string | null>(null);
-
   useEffect(() => {
     if (!location) return;
-
     const key = `${location.lat.toFixed(6)}-${location.lng.toFixed(6)}`;
     if (lastKeyRef.current === key) return;
-
     const timer = setTimeout(async () => {
       lastKeyRef.current = key;
       await runRiskFlow(location.lat, location.lng);
     }, 400);
-
     return () => clearTimeout(timer);
   }, [location, runRiskFlow]);
 }
-/*****************************************************************/
-// 2/17以前
+/****************************************************************************************************/
+// 2/18
+// /**--------------------------------------------------
+//  * Map中央のリスク自動取得Controller
+//  *
+//  * 役割：
+//  * ・locationAtom監視
+//  * ・debounce付きrisk取得
+//  * ・MAP_CLICK（マップ移動）時の都外バナー表示
+//  *   ⇒ ADDRESS_SEARCH / CURRENT_LOCATION はLocationController側で制御済み
+// --------------------------------------------------*/
 // export function useAutoRiskController() {
-//   const center = useAtomValue(mapCenterAtom);
+//   const location = useAtomValue(locationAtom);
+//   const trigger = useAtomValue(locationTriggerAtom);
 //   const { runRiskFlow } = useRiskFlow();
-//   // const { moveMap } = useMapController(); //2017停止
+//   const showBanner = useSetAtom(bannerAtom);
 
-//   // 同一点再取得防止
 //   const lastKeyRef = useRef<string | null>(null);
 
 //   useEffect(() => {
-//     if (!center) return;
+//     if (!location) return;
 
-//     /** -----------------------
-//      * 同一点チェック
-//      -----------------------*/
-//     const key = `${center.lat.toFixed(6)}-${center.lng.toFixed(6)}`;
+//     const key = `${location.lat.toFixed(6)}-${location.lng.toFixed(6)}`;
 //     if (lastKeyRef.current === key) return;
 
-//     /** -----------------------
-//      * debounce
-//      * ドラッグ中連打防止
-//      -----------------------*/
 //     const timer = setTimeout(async () => {
 //       lastKeyRef.current = key;
+//       const flow = await runRiskFlow(location.lat, location.lng);
 
-//       try {
-//         await runRiskFlow(center.lat, center.lng);
-//       } catch (err) {
-//         console.error("[AutoRiskController]", err);
+//       // MAP移動（ドラッグ）時のみバナー制御
+//       // ADDRESS_SEARCH / CURRENT_LOCATION はLocationController側で制御済み
+//       if (trigger === "MAP_CLICK" && flow && !flow.isTokyo) {
+//         showBanner({
+//           visible: true,
+//           type: "error",
+//           message: "⚠ 東京都外です。情報を表示できません。",
+//           duration: 4000
+//         });
 //       }
-//     }, 400); // UX最適値 300〜500ms
+//     }, 400);
 
 //     return () => clearTimeout(timer);
-//   }, [center, runRiskFlow]);
+//   }, [location, runRiskFlow, trigger, showBanner]);
 // }
