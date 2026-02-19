@@ -19,11 +19,8 @@ export function useRiskPoint() {
 
       if (!result) return null;
 
-      setRiskPoint({
-        lat,
-        lng,
-        riskLevel: result.riskLevel
-      });
+      // 2/19修正
+      setRiskPoint(result.riskLevel);
 
       return result;
     } catch (err) {

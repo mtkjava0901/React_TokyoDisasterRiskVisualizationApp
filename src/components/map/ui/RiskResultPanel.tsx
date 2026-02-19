@@ -1,7 +1,7 @@
+import "@/styles/risk-panel.css";
 import { useAtomValue } from "jotai";
 import { riskUiAtom } from "@/atoms/riskUiAtom";
 import { riskResultAtom } from "@/atoms/riskResultAtom";
-import "@/styles/risk-panel.css";
 import { riskLocationStatusAtom } from "@/atoms/riskLocationAtom";
 import { areaModeAtom } from "@/atoms/areaModeAtom";
 import { riskPanelViewModelAtom } from "@/atoms/riskPanelViewModelAtom";

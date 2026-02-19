@@ -79,7 +79,12 @@ export function useRiskFlow() {
           // 取得失敗は無視
         }
 
-        return { result: null, isTokyo: false, isBoundary: false, nearestPoint };
+        return {
+          result: null,
+          isTokyo: false,
+          isBoundary: false,
+          nearestPoint
+        };
       }
 
       // ■ 都内: 境界距離判定
@@ -103,9 +108,9 @@ export function useRiskFlow() {
 
       // 結果統合
       setResult({
-        lat: point.lat,
-        lng: point.lng,
         earthquake: risk?.riskLevel,
+        intensity: risk?.intensity,
+        updatedAt: risk?.dataUpdatedAt,
         address
       });
 

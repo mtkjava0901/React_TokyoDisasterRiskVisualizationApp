@@ -1,23 +1,23 @@
 import axios from "axios";
-import { apiClient } from "./client";
 
 /**---------------------------------------
  * A-03 地震リスク1点判定 API
  * backend:
  * GET /api/earthquake/risk/
  ----------------------------------------*/
-
-/** APIリクエスト型 */
-// export type EarthquakeRiskRequest = {
-//   lat: number;
-//   lng: number;
-//   meshLevel: number;
-// };
+export type RiskLevel = "HIGH" | "MEDIUM" | "LOW";
 
 /** APIレスポンス型（ThunderClient確認済） */
 export type EarthquakeRiskResponse = {
-  riskLevel: "HIGH" | "MEDIUM" | "LOW";
+  riskLevel: RiskLevel;
+  intensity?: number; // 計測震度
+  dataUpdatedAt?: string; // データ更新年月
 };
+
+// 2/18backup
+// export type EarthquakeRiskResponse = {
+//   riskLevel: "HIGH" | "MEDIUM" | "LOW";
+// };
 
 /**------------------------
  * 地震リスク1点判定取得
