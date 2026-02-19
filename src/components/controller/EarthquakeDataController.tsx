@@ -22,10 +22,6 @@ import { mapZoomAtom } from "../../atoms/mapAtom";
  *
  * ※後に実装予定？
 -------------------------------------------------------------- */
-
-/**--------------------------------------------------------------
- * MeshLevel ⇒ バックエンド値マッピング
--------------------------------------------------------------- */
 const meshLevelValueMap: Record<MeshLevel, number | null> = {
   NONE: null,
   PRIMARY: 4,
@@ -38,43 +34,26 @@ export default function EarthquakeDataController() {
   const [zoom] = useAtom(mapZoomAtom);
   const [activeLayer] = useAtom(activeLayerAtom);
   const [, setEarthquakes] = useAtom(earthquakeDataAtom);
-
-  // 内部制御用
   const lastFetchKeyRef = useRef<string | null>(null);
   const isFetchingRef = useRef(false);
-
-  // 地図状態or表示モードの変更で再判定(useEffect)
   useEffect(() => {
-    // bounds(境界)が無い場合はそのまま返す
     if (!bounds) return;
-    console.log("bounds =", bounds);
-
-    // earthquakeレイヤー以外では動かない
+    // --- 修正箇所：タブ切り替え時のクリアを削除 ---
     if (activeLayer !== "earthquake") {
-      setEarthquakes([]);
+      // setEarthquakes([]); // この行をコメントアウトまたは削除
       return;
     }
-
-    // ズーム値の解釈
     const rule = resolveZoomRule(zoom);
-    // fetch不可
     if (!rule.fetchable) {
-      setEarthquakes([]);
+      // setEarthquakes([]); // ズーム外でのクリアも削除（キャッシュとして維持）
       return;
     }
-
     const meshValue = meshLevelValueMap[rule.meshLevel];
-
-    // meshなし = 表示無し
     if (meshValue === null) {
-      setEarthquakes([]);
+      // setEarthquakes([]); // メッシュなしの場合のクリアも削除
       return;
     }
-
-    /**-------------------------------------------------
- * fetch条件キー生成
- * 同条件なら再取得しない
- -------------------------------------------------*/
+    // --------------------------------------------
     const fetchKey = [
       bounds.minLat.toFixed(8),
       bounds.maxLat.toFixed(8),
@@ -84,20 +63,11 @@ export default function EarthquakeDataController() {
       activeLayer,
       meshValue
     ].join("-");
-
-    // 同条件ならskip
     if (lastFetchKeyRef.current === fetchKey) return;
-
-    // fetch中ならskip
     if (isFetchingRef.current) return;
-
-    /** -------------------------
-     * debounce（ドラッグ中連打防止）
-     * -------------------------*/
     const timer = setTimeout(async () => {
       lastFetchKeyRef.current = fetchKey;
       isFetchingRef.current = true;
-
       try {
         const data = await fetchEarthquakeLayer(
           bounds.minLat,
@@ -106,52 +76,109 @@ export default function EarthquakeDataController() {
           bounds.maxLng,
           meshValue
         );
-
         setEarthquakes(data);
       } catch (err) {
         console.error("[EDC] fetchEarthquakeLayer error", err);
-        setEarthquakes([]);
+        // setEarthquakes([]); // エラー時はクリアしても良い
       } finally {
         isFetchingRef.current = false;
       }
-    }, 350); // 300～500ms
-
+    }, 350);
     return () => clearTimeout(timer);
   }, [bounds, zoom, activeLayer, setEarthquakes]);
-
   return null;
 }
 
-//   const fetch = async () => {
-//     // meshValueがnullの場合取得不要
-//     if (meshValue === null) {
-//       console.log("[EDC] meshLevel NONE, fetch skipped");
+/*******************************************************************************************/
+// 2/19
+/**--------------------------------------------------------------
+ * MeshLevel ⇒ バックエンド値マッピング
+-------------------------------------------------------------- */
+// export default function EarthquakeDataController() {
+//   const [bounds] = useAtom(mapBoundsAtom);
+//   const [zoom] = useAtom(mapZoomAtom);
+//   const [activeLayer] = useAtom(activeLayerAtom);
+//   const [, setEarthquakes] = useAtom(earthquakeDataAtom);
+
+//   // 内部制御用
+//   const lastFetchKeyRef = useRef<string | null>(null);
+//   const isFetchingRef = useRef(false);
+
+//   // 地図状態or表示モードの変更で再判定(useEffect)
+//   useEffect(() => {
+//     // bounds(境界)が無い場合はそのまま返す
+//     if (!bounds) return;
+//     console.log("bounds =", bounds);
+
+//     // earthquakeレイヤー以外では動かない
+//     if (activeLayer !== "earthquake") {
 //       setEarthquakes([]);
 //       return;
 //     }
 
-//     try {
-//       // fetchEarthquakeLayerのmeshLevel引数はnumber型に変更済み
-//       const data = await fetchEarthquakeLayer(
-//         bounds.minLat,
-//         bounds.maxLat,
-//         bounds.minLng,
-//         bounds.maxLng,
-//         meshValue
-//       );
-
-//       // 取得結果を保存
-//       setEarthquakes(data);
-//     } catch (err) {
-//       console.error("[EDC] fetchEarthquakeLayer error", err);
-//       setEarthquakes([]); // エラー時は空配列
+//     // ズーム値の解釈
+//     const rule = resolveZoomRule(zoom);
+//     // fetch不可
+//     if (!rule.fetchable) {
+//       setEarthquakes([]);
+//       return;
 //     }
-//   };
 
-//   // [bounds, zoom, activeLayer]が変更される度に条件チェック
-//   // OKなら地震データを再取得
-//   fetch();
-// }, [bounds, zoom, activeLayer, setEarthquakes]);
+//     const meshValue = meshLevelValueMap[rule.meshLevel];
 
-// // 画面には何も表示しない(このcomponentの役割)
-// return null;
+//     // meshなし = 表示無し
+//     if (meshValue === null) {
+//       setEarthquakes([]);
+//       return;
+//     }
+
+//     /**-------------------------------------------------
+//  * fetch条件キー生成
+//  * 同条件なら再取得しない
+//  -------------------------------------------------*/
+//     const fetchKey = [
+//       bounds.minLat.toFixed(8),
+//       bounds.maxLat.toFixed(8),
+//       bounds.minLng.toFixed(8),
+//       bounds.maxLng.toFixed(8),
+//       zoom,
+//       activeLayer,
+//       meshValue
+//     ].join("-");
+
+//     // 同条件ならskip
+//     if (lastFetchKeyRef.current === fetchKey) return;
+
+//     // fetch中ならskip
+//     if (isFetchingRef.current) return;
+
+//     /** -------------------------
+//      * debounce（ドラッグ中連打防止）
+//      * -------------------------*/
+//     const timer = setTimeout(async () => {
+//       lastFetchKeyRef.current = fetchKey;
+//       isFetchingRef.current = true;
+
+//       try {
+//         const data = await fetchEarthquakeLayer(
+//           bounds.minLat,
+//           bounds.maxLat,
+//           bounds.minLng,
+//           bounds.maxLng,
+//           meshValue
+//         );
+
+//         setEarthquakes(data);
+//       } catch (err) {
+//         console.error("[EDC] fetchEarthquakeLayer error", err);
+//         setEarthquakes([]);
+//       } finally {
+//         isFetchingRef.current = false;
+//       }
+//     }, 350); // 300～500ms
+
+//     return () => clearTimeout(timer);
+//   }, [bounds, zoom, activeLayer, setEarthquakes]);
+
+//   return null;
+// }

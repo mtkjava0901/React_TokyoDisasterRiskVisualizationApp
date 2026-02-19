@@ -23,45 +23,19 @@ const MAX_POLYGON_COUNT = 3000;
 
 function EarthquakePolygonLayer() {
   const earthquakes = useAtomValue(earthquakeDataAtom);
-  // console.log("earthquakes:", earthquakes.length);
   const zoom = useAtomValue(mapZoomAtom);
-  console.log("[EarthquakePolygonLayer] zoom =", zoom);
   const bounds = useAtomValue(mapBoundsAtom);
-  // console.log("bounds:", bounds);
   const activeLayer = useAtomValue(activeLayerAtom);
-  // console.log("activeLayer:", activeLayer);
-
-  /*
-  console.log(
-    "[EarthquakePolygonLayer]",
-    "zoom=",
-    zoom,
-    "earthquakes=",
-    earthquakes.length,
-    "activeLayer=",
-    activeLayer
-  );
-  */
-
   /**---------------------------------------------
     * Polygon一覧をメモ化
-    * （earthquakesが変わらない限り再生成しない）
    ---------------------------------------------*/
   const polygons = useMemo(() => {
-    // console.log("=== useMemo start ===");
-    // console.log("activeLayer:", activeLayer);
-    // console.log("zoom:", zoom);
-    // console.log("bounds:", bounds);
-    // console.log("earthquakes length:", earthquakes.length);
-
-    // レイヤー非アクティブの場合(入口ガード)
+    // レイヤー非アクティブの場合
     if (activeLayer !== "earthquake") return [];
     if (!bounds) return [];
-
     // zoomガード
     if (zoom < DETAIL_RENDER_ZOOM || zoom > MAX_RENDER_ZOOM) return [];
     if (earthquakes.length === 0) return [];
-
     // 表示範囲に含まれるポリゴンのみ抽出
     const filtered = earthquakes.filter((eq) =>
       eq.polygon.some(
@@ -72,30 +46,79 @@ function EarthquakePolygonLayer() {
           p.lng <= bounds.maxLng
       )
     );
-    // console.log("filtered count:", filtered.length);
-
     if (filtered.length > MAX_POLYGON_COUNT) {
       console.warn(
         `[EarthquakePolygonLayer] polygon const over limit: ${filtered.length}`
       );
       return null;
     }
-
-    // RiskLevelに応じて色を決め、Polygon描画
     return filtered.map((eq) => (
       <Polygon
         key={eq.meshCode}
         paths={eq.polygon}
-        // LOW/MEDIUM/HIGH
         options={earthquakePolygonStyleMap[eq.riskLevel]}
       />
     ));
-  }, [earthquakes, bounds]);
-
-  console.log("[EarthquakePolygonLayer] polygon count =", polygons?.length);
-
+    // --- 修正箇所：依存配列に activeLayer と zoom を追加 ---
+  }, [earthquakes, bounds, activeLayer, zoom]);
+  // -----------------------------------------------------
   return <>{polygons}</>;
 }
-
-// memoでラップ（親の再描画に引きずられない）
 export default memo(EarthquakePolygonLayer);
+/**********************************************************************************/
+// 2/19
+// function EarthquakePolygonLayer() {
+//   const earthquakes = useAtomValue(earthquakeDataAtom);
+//   const zoom = useAtomValue(mapZoomAtom);
+//   console.log("[EarthquakePolygonLayer] zoom =", zoom);
+//   const bounds = useAtomValue(mapBoundsAtom);
+//   const activeLayer = useAtomValue(activeLayerAtom);
+
+//   /**---------------------------------------------
+//     * Polygon一覧をメモ化
+//     * （earthquakesが変わらない限り再生成しない）
+//    ---------------------------------------------*/
+//   const polygons = useMemo(() => {
+//     // レイヤー非アクティブの場合(入口ガード)
+//     if (activeLayer !== "earthquake") return [];
+//     if (!bounds) return [];
+
+//     // zoomガード
+//     if (zoom < DETAIL_RENDER_ZOOM || zoom > MAX_RENDER_ZOOM) return [];
+//     if (earthquakes.length === 0) return [];
+
+//     // 表示範囲に含まれるポリゴンのみ抽出
+//     const filtered = earthquakes.filter((eq) =>
+//       eq.polygon.some(
+//         (p) =>
+//           p.lat >= bounds.minLat &&
+//           p.lat <= bounds.maxLat &&
+//           p.lng >= bounds.minLng &&
+//           p.lng <= bounds.maxLng
+//       )
+//     );
+
+//     if (filtered.length > MAX_POLYGON_COUNT) {
+//       console.warn(
+//         `[EarthquakePolygonLayer] polygon const over limit: ${filtered.length}`
+//       );
+//       return null;
+//     }
+
+//     // RiskLevelに応じて色を決め、Polygon描画
+//     return filtered.map((eq) => (
+//       <Polygon
+//         key={eq.meshCode}
+//         paths={eq.polygon}
+//         options={earthquakePolygonStyleMap[eq.riskLevel]}
+//       />
+//     ));
+//   }, [earthquakes, bounds]);
+
+//   console.log("[EarthquakePolygonLayer] polygon count =", polygons?.length);
+
+//   return <>{polygons}</>;
+// }
+
+// // memoでラップ（親の再描画に引きずられない）
+// export default memo(EarthquakePolygonLayer);
