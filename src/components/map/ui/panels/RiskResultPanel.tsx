@@ -52,7 +52,10 @@ export default function RiskResultPanel() {
         <>
           {/* リスクレベル */}
           <div className="risk-item">
-            <span className="risk-label">地震リスク</span>
+            {/* <span className="risk-label">地震リスク</span> */}
+            <span className="risk-label">
+              {vm.disasterType === "EARTHQUAKE" ? "地震リスク" : "洪水リスク"}
+            </span>
             <span className={`risk-value ${getRiskClass(vm.riskLevel)}`}>
               {vm.riskLevelLabel ?? "-"}
             </span>
@@ -74,8 +77,10 @@ export default function RiskResultPanel() {
 
           {/* 想定震度 */}
           <div className="risk-item">
-            <span className="risk-label">想定値</span>
-            {/* <span className="risk-value">{result.intensity ?? "-"}</span> */}
+            {/* <span className="risk-label">想定値</span> */}
+            <span className="risk-label">
+              {vm.disasterType === "EARTHQUAKE" ? "想定震度" : "想定浸水深"}
+            </span>
             <span className="risk-value">{vm.hazardValue ?? "-"}</span>
           </div>
 

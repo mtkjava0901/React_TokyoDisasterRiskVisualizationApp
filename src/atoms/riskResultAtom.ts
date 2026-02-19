@@ -11,14 +11,12 @@ export type RiskResult = {
   updatedAt?: string;
   zoom?: number | null;
   scaleLabel?: string;
-};
 
-// 2/18backup
-// export type RiskResult = {
-//   lat: number;
-//   lng: number;
-//   earthquake?: "HIGH" | "MEDIUM" | "LOW";
-//   address?: string;
-// };
+  // 2/20 洪水リスク追加
+  flood?: "HIGH" | "MEDIUM" | "LOW" | "UNKNOWN";
+  floodRank?: number | null;
+  floodDepthDescription?: string | null;
+  floodUpdatedAt?: string;
+};
 
 export const riskResultAtom = atom<RiskResult | null>(null);

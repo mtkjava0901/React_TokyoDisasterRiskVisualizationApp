@@ -8,7 +8,7 @@ import { fetchNearestBoundary } from "@/api/boundaryApi";
 import { areaModeAtom } from "@/atoms/areaModeAtom";
 import { tokyoStatusAtom } from "@/atoms/tokyoStatusAtom";
 import { useReverseGeocode } from "@/hooks/useReverseGeocode";
-// bannerAtomはController側で制御するためimport不要
+import { fetchFloodRisk } from "@/api/floodRiskApi";
 
 /**----------------------------------------
  * 順制御hook（オーケストレーションhook）
@@ -45,7 +45,7 @@ export function useRiskFlow() {
 
   /**------------------------------------
    * メイン実行フロー
-   ------------------------------------*/
+  ------------------------------------*/
   const runRiskFlow = async (
     lat: number,
     lng: number,
@@ -101,9 +101,10 @@ export function useRiskFlow() {
         setAreaMode("INSIDE_TOKYO");
       }
 
-      // A-03 リスク取得 + 住所取得（並列処理）
-      const [risk, address] = await Promise.all([
+      // A-03+A-04 リスク取得+住所取得（並列処理）
+      const [risk, floodRisk, address] = await Promise.all([
         fetchRisk(point.lat, point.lng),
+        fetchFloodRisk(point.lat, point.lng),
         getAddress(point.lat, point.lng)
       ]);
 
@@ -113,7 +114,12 @@ export function useRiskFlow() {
         intensity: risk?.intensity,
         updatedAt: risk?.dataUpdatedAt,
         address,
-        zoomLevel: zoom
+        zoomLevel: zoom,
+        // 0220 洪水欄
+        flood: floodRisk?.riskLevel,
+        floodRank: floodRisk?.rank,
+        floodDepthDescription: floodRisk?.depthDescription,
+        floodUpdatedAt: floodRisk?.dataUpdatedAt
       });
 
       setUi({ loading: false, error: null });

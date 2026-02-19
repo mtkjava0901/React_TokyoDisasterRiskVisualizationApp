@@ -2,9 +2,6 @@ import { useAtomValue } from "jotai";
 import RiskResultPanel from "./RiskResultPanel";
 import { activeLayerAtom } from "@/atoms/activeLayerAtom";
 
-// 将来
-// import FloodResultPanel from "./FloodResultPanel";
-
 export default function DisasterPanelContainer() {
   const layer = useAtomValue(activeLayerAtom);
 
@@ -16,7 +13,7 @@ export default function DisasterPanelContainer() {
   }
 
   if (layer === "flood") {
-    return <div>洪水パネル（未実装）</div>;
+    return <RiskResultPanel />;
   }
 
   return null;

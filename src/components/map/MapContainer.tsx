@@ -23,6 +23,8 @@ import Banner from "./ui/banner/Bannner";
 import BannerController from "./ui/banner/BannerController";
 import { useInitializeLocation } from "@/hooks/useInitializeLocation";
 import DisasterPanelContainer from "./ui/panels/DisasterPanelContainer";
+import FloodPolygonLayer from "./layers/flood/FloodPolygonLayer";
+import FloodDataController from "../controller/FloodDataController";
 
 const LIBRARIES: "geometry"[] = ["geometry"];
 
@@ -102,22 +104,20 @@ export default function MapContainer() {
         {...mapEvents}
       >
         <EarthquakePolygonLayer />
+        <FloodPolygonLayer />
       </MapView>
 
       <CrosshairUI />
 
-      {/* <RiskResultPanel /> */}
       <DisasterPanelContainer />
 
-      {/* <TokyoStatusBanner /> */}
       <Banner />
       <BannerController />
       <LegendUI />
       <FooterUI />
 
       <EarthquakeDataController />
+      <FloodDataController />
     </div>
   );
 }
-
-/***********************************************************************************************/
