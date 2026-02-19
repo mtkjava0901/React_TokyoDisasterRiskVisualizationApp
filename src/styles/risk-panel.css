@@ -72,6 +72,7 @@
 .risk-value {
   font-weight: 600;
   text-align: right;
+  white-space: pre-line;
 }
 
 /* -------------------------

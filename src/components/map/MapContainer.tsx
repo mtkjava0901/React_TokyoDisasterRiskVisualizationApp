@@ -3,7 +3,7 @@ import MapView from "./MapView";
 import EarthquakePolygonLayer from "./layers/earthquake/EarthquakePolygonLayer";
 import LegendUI from "./ui/LegendUI";
 import FooterUI from "./ui/FooterUI";
-import RiskResultPanel from "./ui/RiskResultPanel";
+import RiskResultPanel from "./ui/panels/RiskResultPanel";
 
 import useMapEventSync from "@/hooks/useMapEventSync";
 import { useEarthquakeLayer } from "@/hooks/useEarthquakeLayer";
@@ -22,6 +22,7 @@ import { useRiskLocationController } from "@/hooks/risk/useRiskLocationControlle
 import Banner from "./ui/banner/Bannner";
 import BannerController from "./ui/banner/BannerController";
 import { useInitializeLocation } from "@/hooks/useInitializeLocation";
+import DisasterPanelContainer from "./ui/panels/DisasterPanelContainer";
 
 const LIBRARIES: "geometry"[] = ["geometry"];
 
@@ -105,7 +106,8 @@ export default function MapContainer() {
 
       <CrosshairUI />
 
-      <RiskResultPanel />
+      {/* <RiskResultPanel /> */}
+      <DisasterPanelContainer />
 
       {/* <TokyoStatusBanner /> */}
       <Banner />

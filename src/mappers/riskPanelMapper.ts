@@ -1,6 +1,7 @@
 import { zoomToScaleLabel } from "@/domain/map/zoomToScaleLabel";
 import { intensityToLabel } from "@/domain/risk/intensityToLabel";
 import { riskLevelToLabel } from "@/domain/risk/riskLavelToLabel";
+import { formatAddress } from "@/domain/address/formatAddress";
 import { RiskPanelViewModel } from "@/types/RiskPanelViewModel";
 
 /**------------------------------
@@ -20,7 +21,7 @@ export function toRiskPanelViewModel(
     riskLevel: result.earthquake ?? null,
     riskLevelLabel: riskLevelToLabel(result.earthquake),
 
-    address: result.address,
+    address: formatAddress(result.address),
 
     zoomLabel: zoomToScaleLabel(zoom),
 
