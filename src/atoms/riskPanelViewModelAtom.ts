@@ -1,15 +1,16 @@
 import { atom } from "jotai";
 import { riskResultAtom } from "./riskResultAtom";
 import { toRiskPanelViewModel } from "@/mappers/riskPanelMapper";
+import { mapZoomAtom } from "./mapAtom";
 
 /**-------------------------------------
  * RiskResult → ViewModel変換
  -------------------------------------*/
 export const riskPanelViewModelAtom = atom((get) => {
   const result = get(riskResultAtom);
+  const zoom = get(mapZoomAtom);
 
-  // デバッグ
-  console.log("riskResultAtom中身", result);
+  if (!result) return null;
 
-  return toRiskPanelViewModel(result);
+  return toRiskPanelViewModel(result, zoom);
 });

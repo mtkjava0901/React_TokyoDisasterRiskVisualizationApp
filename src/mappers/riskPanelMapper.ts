@@ -1,9 +1,13 @@
+import { zoomToScaleLabel } from "@/domain/map/zoomToScaleLabel";
 import { RiskPanelViewModel } from "@/types/RiskPanelViewModel";
 
 /**------------------------------
  * APIレスポンス → ViewModel変換
 ------------------------------ */
-export function toRiskPanelViewModel(result: any): RiskPanelViewModel | null {
+export function toRiskPanelViewModel(
+  result: any,
+  zoom: number | null | undefined
+): RiskPanelViewModel | null {
   if (!result) return null;
 
   return {
@@ -12,7 +16,8 @@ export function toRiskPanelViewModel(result: any): RiskPanelViewModel | null {
     riskLevel: result.earthquake ?? null,
 
     address: result.address,
-    zoomLabel: result.zoomLevel,
+
+    zoomLabel: zoomToScaleLabel(zoom),
 
     // 地震用
     hazardValue: result.intensity,

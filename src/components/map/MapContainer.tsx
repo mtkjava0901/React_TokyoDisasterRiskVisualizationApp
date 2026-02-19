@@ -10,6 +10,8 @@ import { useEarthquakeLayer } from "@/hooks/useEarthquakeLayer";
 import { useSyncMeshLevel } from "@/hooks/useSyncMeshLevel";
 
 import { useRef } from "react";
+import { useAtomValue } from "jotai";
+import { mapCenterAtom, mapZoomAtom } from "@/atoms/mapAtom";
 
 import { useLocationController } from "@/hooks/location/useLocationController";
 import { useMapController } from "@/hooks/map/useMapController";
@@ -50,7 +52,11 @@ export default function MapContainer() {
   // Global state
   // const center = useAtomValue(mapCenterAtom);
   // const zoom = useAtomValue(mapZoomAtom);
-  const { center, zoom } = useMapController();
+
+  // 2/19
+  //const { center, zoom } = useMapController();
+  const center = useAtomValue(mapCenterAtom);
+  const zoom = useAtomValue(mapZoomAtom);
 
   // Map instance
   const mapRef = useRef<google.maps.Map | null>(null);

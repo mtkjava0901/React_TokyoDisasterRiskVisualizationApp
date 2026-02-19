@@ -9,6 +9,8 @@ export type RiskResult = {
   zoomLevel?: number;
   intensity?: number;
   updatedAt?: string;
+  zoom?: number | null;
+  scaleLabel?: string;
 };
 
 // 2/18backup

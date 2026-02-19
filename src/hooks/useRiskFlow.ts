@@ -48,7 +48,8 @@ export function useRiskFlow() {
    ------------------------------------*/
   const runRiskFlow = async (
     lat: number,
-    lng: number
+    lng: number,
+    zoom?: number
   ): Promise<RiskFlowResult> => {
     console.log("[runRiskFlow] called:", lat, lng);
 
@@ -111,7 +112,8 @@ export function useRiskFlow() {
         earthquake: risk?.riskLevel,
         intensity: risk?.intensity,
         updatedAt: risk?.dataUpdatedAt,
-        address
+        address,
+        zoomLevel: zoom
       });
 
       setUi({ loading: false, error: null });

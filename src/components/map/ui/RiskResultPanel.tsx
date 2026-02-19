@@ -59,15 +59,15 @@ export default function RiskResultPanel() {
 
           {/* 住所 */}
           <div className="risk-item">
-            <span className="risk-label">住所</span>
+            <span className="risk-label">対象地域</span>
             {/* <span className="risk-value">{result.address ?? "-"}</span> */}
             <span className="risk-value">{vm.address ?? "-"}</span>
           </div>
 
           {/* ズームレベル */}
           <div className="risk-item">
-            <span className="risk-label">ズームレベル</span>
-            {/* <span className="risk-value">{result.zoomLevel ?? "-"}</span> */}
+            <span className="risk-label">表示範囲</span>
+            {/* <span className="risk-value">{vm.zoomLabel ?? "-"}</span> */}
             <span className="risk-value">{vm.zoomLabel ?? "-"}</span>
           </div>
 

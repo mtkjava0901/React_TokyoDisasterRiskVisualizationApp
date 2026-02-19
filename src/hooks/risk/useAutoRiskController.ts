@@ -2,8 +2,7 @@ import { useEffect, useRef } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useRiskFlow } from "@/hooks/useRiskFlow";
 import { locationAtom } from "@/atoms/locationAtom";
-import { locationTriggerAtom } from "@/atoms/locationTriggerAtom";
-import { bannerAtom } from "@/atoms/bannerAtom";
+import { mapZoomAtom } from "@/atoms/mapAtom";
 
 /**--------------------------------------------------
  * Map中央のリスク自動取得Controller
@@ -11,22 +10,27 @@ import { bannerAtom } from "@/atoms/bannerAtom";
  * ・locationAtom監視
  * ・debounce付きrisk取得
  *
- * バナー制御は BannerController に一本化。
+ * ※バナー制御は BannerController に一本化
 --------------------------------------------------*/
 export function useAutoRiskController() {
   const location = useAtomValue(locationAtom);
+  const zoom = useAtomValue(mapZoomAtom);
   const { runRiskFlow } = useRiskFlow();
   const lastKeyRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!location) return;
+
     const key = `${location.lat.toFixed(6)}-${location.lng.toFixed(6)}`;
     if (lastKeyRef.current === key) return;
+
     const timer = setTimeout(async () => {
       lastKeyRef.current = key;
-      await runRiskFlow(location.lat, location.lng);
+      await runRiskFlow(location.lat, location.lng, zoom);
     }, 400);
+
     return () => clearTimeout(timer);
-  }, [location, runRiskFlow]);
+  }, [location, zoom, runRiskFlow]);
 }
 /****************************************************************************************************/
 // 2/18
