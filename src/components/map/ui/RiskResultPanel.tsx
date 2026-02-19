@@ -22,6 +22,10 @@ export default function RiskResultPanel() {
   if (!vm) return null;
 
   console.log("vm", vm);
+
+  console.log("riskLevel:", vm.riskLevel);
+  console.log("riskLevelLabel:", vm.riskLevelLabel);
+
   /**----------------------
    * 都外 ⇒ 非表示
    ----------------------*/
@@ -49,11 +53,8 @@ export default function RiskResultPanel() {
           {/* リスクレベル */}
           <div className="risk-item">
             <span className="risk-label">地震リスク</span>
-            {/* <span
-              className={`risk-value risk-${result.earthquake?.toLowerCase()}`}
-            > */}
             <span className={`risk-value ${getRiskClass(vm.riskLevel)}`}>
-              {vm.riskLevel ?? "-"}
+              {vm.riskLevelLabel ?? "-"}
             </span>
           </div>
 

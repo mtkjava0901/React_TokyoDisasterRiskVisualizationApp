@@ -22,7 +22,9 @@ export type RiskLevel = "HIGH" | "MEDIUM" | "LOW" | null;
 export type RiskPanelViewModel = {
   disasterType: DisasterType;
 
-  riskLevel: RiskLevel;
+  // riskLevel: RiskLevel;
+  riskLevel: string | null; // HIGH/MEDIUM/LOW
+  riskLevelLabel: string; // 揺れやすい など
 
   address?: string;
   zoomLabel?: string;
