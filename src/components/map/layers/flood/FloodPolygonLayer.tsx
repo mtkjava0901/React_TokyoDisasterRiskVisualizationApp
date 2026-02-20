@@ -13,6 +13,11 @@ import { activeLayerAtom } from "../../../../atoms/activeLayerAtom";
  * ・riskLevelに応じた「見た目を決める」
  * ・描画だけに集中
  * ・再レンダリング最小化
+ *
+ * 2/20fix
+ * ・bboxで高速intersection
+ * ・polygon走査ゼロ
+ * ・超軽量描画
  ---------------------------------------------*/
 // zoom9未満では洪水レイヤーは非表示
 const DETAIL_RENDER_ZOOM = 9;
@@ -37,54 +42,54 @@ function FloodPolygonLayer() {
     if (zoom < DETAIL_RENDER_ZOOM || zoom > MAX_RENDER_ZOOM) return [];
     if (floods.length === 0) return [];
 
-    // 表示範囲に含まれるポリゴンのみ抽出(強化版)
-    const filtered = floods
-      .map((f) => {
-        // ポリゴンの簡易bounding boxを計算
-        const polyBounds = f.polygon.reduce(
-          (bb, p) => ({
-            minLat: Math.min(bb.minLat, p.lat),
-            maxLat: Math.max(bb.maxLat, p.lat),
-            minLng: Math.min(bb.minLng, p.lng),
-            maxLng: Math.max(bb.maxLng, p.lng)
-          }),
-          {
-            minLat: Infinity,
-            maxLat: -Infinity,
-            minLng: Infinity,
-            maxLng: -Infinity
-          }
-        );
+    // 表示範囲に含まれるポリゴンのみ抽出(bbox intersectionだけで判定)
+    const filtered = floods.filter((f) => {
+      return (
+        f.bbox.maxLat >= bounds.minLat &&
+        f.bbox.minLat <= bounds.maxLat &&
+        f.bbox.maxLng >= bounds.minLng &&
+        f.bbox.minLng <= bounds.maxLng
+      );
+    });
 
-        // 交差判定 少しでも画面と重なれば表示対象(2/20)
-        const intersects =
-          polyBounds.maxLat >= bounds.minLat &&
-          polyBounds.minLat <= bounds.maxLat &&
-          polyBounds.maxLng >= bounds.minLng &&
-          polyBounds.minLng <= bounds.maxLng;
+    // 2/19
+    // const filtered = floods
+    //   .map((f) => {
+    //     // ポリゴンの簡易bounding boxを計算
+    //     const polyBounds = f.polygon.reduce(
+    //       (bb, p) => ({
+    //         minLat: Math.min(bb.minLat, p.lat),
+    //         maxLat: Math.max(bb.maxLat, p.lat),
+    //         minLng: Math.min(bb.minLng, p.lng),
+    //         maxLng: Math.max(bb.maxLng, p.lng)
+    //       }),
+    //       {
+    //         minLat: Infinity,
+    //         maxLat: -Infinity,
+    //         minLng: Infinity,
+    //         maxLng: -Infinity
+    //       }
+    //     );
 
-        return intersects ? f : null;
-      })
-      .filter(Boolean) as NonNullable<(typeof floods)[number]>[];
+    //     // 交差判定 少しでも画面と重なれば表示対象(2/20)
+    //     const intersects =
+    //       polyBounds.maxLat >= bounds.minLat &&
+    //       polyBounds.minLat <= bounds.maxLat &&
+    //       polyBounds.maxLng >= bounds.minLng &&
+    //       polyBounds.minLng <= bounds.maxLng;
+
+    //     return intersects ? f : null;
+    //   })
+    //   .filter(Boolean) as NonNullable<(typeof floods)[number]>[];
 
     // Polygon数検証用
     console.log(
       `[FloodPolygonLayer] zoom:${zoom}, total:${floods.length}, filtered:${filtered.length}/${MAX_POLYGON_COUNT}`
     );
 
-    // zoom別 描画数制限
-    let safePolygons = filtered;
+    const safe = filtered.slice(0, MAX_POLYGON_COUNT);
 
-    // 上限チェック
-    if (filtered.length > MAX_POLYGON_COUNT) {
-      console.warn(
-        `[FloodPolygonLayer] polygon count over limit: ${filtered.length}, rendering first ${MAX_POLYGON_COUNT}`
-      );
-      safePolygons = filtered.slice(0, MAX_POLYGON_COUNT);
-    }
-
-    // Polygon生成
-    return safePolygons.map((f, index) => (
+    return safe.map((f, index) => (
       <Polygon
         key={`flood-${index}`}
         paths={f.polygon}
@@ -92,6 +97,28 @@ function FloodPolygonLayer() {
       />
     ));
   }, [floods, bounds, activeLayer, zoom]);
+
+  // 2/20
+  //   // zoom別 描画数制限
+  //   let safePolygons = filtered;
+
+  //   // 上限チェック
+  //   if (filtered.length > MAX_POLYGON_COUNT) {
+  //     console.warn(
+  //       `[FloodPolygonLayer] polygon count over limit: ${filtered.length}, rendering first ${MAX_POLYGON_COUNT}`
+  //     );
+  //     safePolygons = filtered.slice(0, MAX_POLYGON_COUNT);
+  //   }
+
+  //   // Polygon生成
+  //   return safePolygons.map((f, index) => (
+  //     <Polygon
+  //       key={`flood-${index}`}
+  //       paths={f.polygon}
+  //       options={floodPolygonStyleMap[f.riskLevel]}
+  //     />
+  //   ));
+  // }, [floods, bounds, activeLayer, zoom]);
 
   return <>{polygons}</>;
 }

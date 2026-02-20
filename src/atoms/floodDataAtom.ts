@@ -1,10 +1,10 @@
 import { atom } from "jotai";
-import { FloodLayerDto } from "../types/Flood";
+import { FloodPolygon } from "../types/Flood";
 
 /**------------------------------------------------------------------
  * floodDataAtom：表示中の洪水レイヤーデータ本体
  *
- * ・A-02のレスポンスをそのまま保持する
- * ・(⇒バックエンドのFloodLayerDtoと完全一致)
+ * ・API取得時にbbox付きへ変換済み
+ * ・描画最適化済みデータを保持
  ------------------------------------------------------------------ */
-export const floodDataAtom = atom<FloodLayerDto[]>([]);
+export const floodDataAtom = atom<FloodPolygon[]>([]);

@@ -52,7 +52,6 @@ export default function RiskResultPanel() {
         <>
           {/* リスクレベル */}
           <div className="risk-item">
-            {/* <span className="risk-label">地震リスク</span> */}
             <span className="risk-label">
               {vm.disasterType === "EARTHQUAKE" ? "地震リスク" : "洪水リスク"}
             </span>
@@ -64,20 +63,17 @@ export default function RiskResultPanel() {
           {/* 住所 */}
           <div className="risk-item">
             <span className="risk-label">対象地域</span>
-            {/* <span className="risk-value">{result.address ?? "-"}</span> */}
             <span className="risk-value">{vm.address ?? "-"}</span>
           </div>
 
           {/* ズームレベル */}
           <div className="risk-item">
             <span className="risk-label">表示範囲</span>
-            {/* <span className="risk-value">{vm.zoomLabel ?? "-"}</span> */}
             <span className="risk-value">{vm.zoomLabel ?? "-"}</span>
           </div>
 
           {/* 想定震度 */}
           <div className="risk-item">
-            {/* <span className="risk-label">想定値</span> */}
             <span className="risk-label">
               {vm.disasterType === "EARTHQUAKE" ? "想定震度" : "想定浸水深"}
             </span>
@@ -87,12 +83,11 @@ export default function RiskResultPanel() {
           {/* 最終更新 */}
           <div className="risk-item">
             <span className="risk-label">最終更新</span>
-            {/* <span className="risk-value">{result.updatedAt ?? "-"}</span> */}
             <span className="risk-value">{vm.updatedAt ?? "-"}</span>
           </div>
 
-          {/* 後に削除 */}
-          <div>状態: {status}</div>
+          {/* 後に削除/状態確認用 */}
+          {/* <div>状態: {status}</div> */}
         </>
       )}
     </div>
