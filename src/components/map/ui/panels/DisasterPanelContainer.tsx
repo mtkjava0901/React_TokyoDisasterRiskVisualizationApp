@@ -8,13 +8,13 @@ export default function DisasterPanelContainer() {
   // 地図タブ → 非表示
   if (layer === "map") return null;
 
-  if (layer === "earthquake") {
-    return <RiskResultPanel />;
-  }
+  // if (layer === "earthquake") {
+  //   return <RiskResultPanel />;
+  // }
 
-  if (layer === "flood") {
-    return <RiskResultPanel />;
-  }
+  // if (layer === "flood") {
+  //   return <RiskResultPanel />;
+  // }
 
-  return null;
+  return <RiskResultPanel />;
 }

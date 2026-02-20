@@ -1,37 +1,34 @@
-import { RiskLevel } from "@/types/risk";
-import { riskClassMap } from "@/constants/riskStyleMap";
-
 /**------------------
  * Helper関数
  ------------------*/
-export function getRiskClass(level: string | null | undefined) {
-  if (!level) return "";
+export function getRiskClass(
+  disasterType: "EARTHQUAKE" | "FLOOD",
+  riskLevel?: string | null
+) {
+  if (!riskLevel) return "";
 
-  switch (level) {
-    case "HIGH":
-      return "risk-high";
-    case "MEDIUM":
-      return "risk-medium";
-    case "LOW":
-      return "risk-low";
-    default:
-      return "";
+  const level = riskLevel.toLowerCase();
+
+  if (disasterType === "FLOOD") {
+    return `risk-flood-${level}`;
   }
-  // switch (level) {
-  //   case "揺れやすい":
-  //     return "risk-high";
-  //   case "やや揺れやすい":
-  //     return "risk-medium";
-  //   case "比較的揺れにくい":
-  //     return "risk-low";
-  //   default:
-  //     return "";
-  // }
+
+  // default = 地震
+  return `risk-earthquake-${level}`;
 }
 
 /*************************************************************/
-// 2/19
-// export function getRiskClass(level?: RiskLevel | null) {
+// export function getRiskClass(level: string | null | undefined) {
 //   if (!level) return "";
-//   return riskClassMap[level];
+
+//   switch (level) {
+//     case "HIGH":
+//       return "risk-high";
+//     case "MEDIUM":
+//       return "risk-medium";
+//     case "LOW":
+//       return "risk-low";
+//     default:
+//       return "";
+//   }
 // }

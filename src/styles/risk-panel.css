@@ -2,6 +2,9 @@
    RiskResultPanel
 ========================= */
 
+/***************************************************************/
+/* 2/19以前 */
+
 /* 右上固定パネル */
 .risk-panel {
   position: fixed;
@@ -94,11 +97,64 @@
   font-size: 14px;
 }
 
+/* ===== 地震 ===== */
+
+.risk-earthquake-high {
+  color: white;
+  background: #dc143c;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.risk-earthquake-medium {
+  color: white;
+  background: #ff9900;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.risk-earthquake-low {
+  color: white;
+  /* background: #2e7d32; */
+  background: #ffd700;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+/* ===== 洪水 ===== */
+
+.risk-flood-high {
+  color: white;
+  background: #0d47a1; /* 濃い青 */
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.risk-flood-medium {
+  color: white;
+  background: #1976d2; /* 中青 */
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.risk-flood-low {
+  color: white;
+  background: #64b5f6; /* 薄青 */
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
 /* -------------------------
-   リスク色（バッジ表示）
+   リスク色（バッジ表示）(2/20未使用)
 ------------------------- */
 
-.risk-high {
+/* .risk-high {
   color: white;
   background: #dc143c;
   padding: 3px 10px;
@@ -120,82 +176,4 @@
   padding: 3px 10px;
   border-radius: 6px;
   font-weight: 700;
-}
-
-/***************************************************************/
-
-/* RiskResultPanel */
-
-/* 右上固定パネル */
-/* .risk-panel {
-  position: fixed; */
-
-/* header + banner考慮 */
-/* top: 72px; */
-/* top: 85px;
-  right: 0px;
-
-  width: 260px;
-  padding: 14px;
-
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(6px);
-
-  border-radius: 10px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-
-  z-index: 20;
-} */
-
-/* タイトル */
-/* .risk-panel-title {
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 12px;
-} */
-
-/* ローディング / 空状態 */
-/* .risk-panel-message {
-  font-size: 13px;
-  color: #666;
-} */
-
-/* エラー */
-/* .risk-panel-error {
-  color: #dc143c;
-  font-size: 13px;
-} */
-
-/* 情報ブロック */
-/* .risk-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-
-  font-size: 14px;
-} */
-
-/* ラベル */
-/* .risk-label {
-  color: #666;
-} */
-
-/* 値 */
-/* .risk-value {
-  font-weight: 600;
-} */
-
-/* --- 将来のリスク色 (Step4で使う) --- */
-
-/* .risk-high {
-  color: #dc143c;
-} */
-
-/* .risk-medium {
-  color: #ff9900;
-} */
-
-/* .risk-low {
-  color: #2e7d32;
 } */

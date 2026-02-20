@@ -55,7 +55,13 @@ export default function RiskResultPanel() {
             <span className="risk-label">
               {vm.disasterType === "EARTHQUAKE" ? "地震リスク" : "洪水リスク"}
             </span>
-            <span className={`risk-value ${getRiskClass(vm.riskLevel)}`}>
+            {/* <span className={`risk-value ${getRiskClass(vm.riskLevel)}`}> */}
+            <span
+              className={`risk-value ${getRiskClass(
+                vm.disasterType,
+                vm.riskLevel
+              )}`}
+            >
               {vm.riskLevelLabel ?? "-"}
             </span>
           </div>
