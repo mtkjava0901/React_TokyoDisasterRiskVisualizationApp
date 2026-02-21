@@ -14,10 +14,6 @@ export function useSyncMeshLevel() {
   const [, setMeshLevel] = useAtom(meshLevelAtom);
 
   useEffect(() => {
-    console.log("[mesh sync] force tertiary", zoom);
     setMeshLevel(MeshLevel.TERTIARY);
   }, [zoom]);
 }
-// 可変meshLevel(今は使わない)
-// console.log("[mesh sync]", zoom, level);
-// setMeshLevel(level);

@@ -22,7 +22,6 @@ export async function fetchFloodRisk(
   lng: number
 ): Promise<FloodRiskResponse | null> {
   try {
-    console.log("fetchFloodRisk params", { lat, lng });
     const response = await axios.get<FloodRiskResponse>(
       "http://localhost:8080/api/flood/risk",
       { params: { lat, lng } }

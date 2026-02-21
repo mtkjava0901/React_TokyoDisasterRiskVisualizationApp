@@ -52,12 +52,6 @@ export default function MapContainer() {
     libraries: LIBRARIES
   });
 
-  // Global state
-  // const center = useAtomValue(mapCenterAtom);
-  // const zoom = useAtomValue(mapZoomAtom);
-
-  // 2/19
-  //const { center, zoom } = useMapController();
   const center = useAtomValue(mapCenterAtom);
   const zoom = useAtomValue(mapZoomAtom);
 
@@ -102,6 +96,14 @@ export default function MapContainer() {
         }}
         onClick={handleMapClick}
         {...mapEvents}
+        onIdle={() => {
+          if (mapRef.current) {
+            console.log("現在のズーム値:", mapRef.current.getZoom());
+          }
+          if (mapEvents.onIdle) {
+            mapEvents.onIdle();
+          }
+        }}
       >
         <EarthquakePolygonLayer />
         <FloodPolygonLayer />

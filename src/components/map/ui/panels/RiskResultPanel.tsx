@@ -21,10 +21,10 @@ export default function RiskResultPanel() {
   const vm = useAtomValue(riskPanelViewModelAtom);
   if (!vm) return null;
 
-  console.log("vm", vm);
+  // console.log("vm", vm);
 
-  console.log("riskLevel:", vm.riskLevel);
-  console.log("riskLevelLabel:", vm.riskLevelLabel);
+  // console.log("riskLevel:", vm.riskLevel);
+  // console.log("riskLevelLabel:", vm.riskLevelLabel);
 
   /**----------------------
    * 都外 ⇒ 非表示
@@ -35,6 +35,12 @@ export default function RiskResultPanel() {
 
   return (
     <div className="risk-panel">
+      {/* 想定パネル情報 */}
+      <div className="risk-panel-assumption">
+        {vm?.disasterType === "EARTHQUAKE"
+          ? "想定地震：都心南部直下地震"
+          : "想定洪水：想定最大規模による洪水"}
+      </div>
       <div className="risk-panel-title">選択地点の災害リスク</div>
       {/* Loading */}
       {ui.loading && <div className="risk-panel-message">取得中...</div>}
@@ -55,7 +61,6 @@ export default function RiskResultPanel() {
             <span className="risk-label">
               {vm.disasterType === "EARTHQUAKE" ? "地震リスク" : "洪水リスク"}
             </span>
-            {/* <span className={`risk-value ${getRiskClass(vm.riskLevel)}`}> */}
             <span
               className={`risk-value ${getRiskClass(
                 vm.disasterType,

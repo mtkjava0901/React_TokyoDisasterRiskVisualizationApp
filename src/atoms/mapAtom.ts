@@ -9,11 +9,11 @@ export type MapCenter = {
   lng: number;
 };
 
-// 地図中心のatom（座標指定:東京駅）
+// 地図中心のatom（座標指定:東京都庁）
 export const mapCenterAtom = atom<MapCenter>({
-  lat: 35.681236,
-  lng: 139.767125
+  lat: 35.6894,
+  lng: 139.6917
 });
 
-// ズームレベルのatom（12=市区町村レベルが見える位）
-export const mapZoomAtom = atom<number>(12);
+// ズームレベルのatom（10=初期値）
+export const mapZoomAtom = atom<number>(11);

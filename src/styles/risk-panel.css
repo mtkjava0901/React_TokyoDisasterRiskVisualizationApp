@@ -25,6 +25,18 @@
   font-family: system-ui, sans-serif;
 }
 
+/* 想定パネル情報 */
+.risk-panel-assumption {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background-color: #555;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
 /* タイトル */
 .risk-panel-title {
   font-size: 15px;

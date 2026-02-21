@@ -14,11 +14,6 @@ export type EarthquakeRiskResponse = {
   dataUpdatedAt?: string; // データ更新年月
 };
 
-// 2/18backup
-// export type EarthquakeRiskResponse = {
-//   riskLevel: "HIGH" | "MEDIUM" | "LOW";
-// };
-
 /**------------------------
  * 地震リスク1点判定取得
 ------------------------ */
@@ -27,7 +22,6 @@ export async function fetchEarthquakeRisk(
   lng: number
 ): Promise<EarthquakeRiskResponse | null> {
   try {
-    console.log("fetch params", { lat, lng });
     const response = await axios.get<EarthquakeRiskResponse>(
       "http://localhost:8080/api/earthquake/risk",
       { params: { lat, lng } }

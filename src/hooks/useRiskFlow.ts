@@ -51,8 +51,6 @@ export function useRiskFlow() {
     lng: number,
     zoom?: number
   ): Promise<RiskFlowResult> => {
-    console.log("[runRiskFlow] called:", lat, lng);
-
     try {
       // UI loading ON
       setUi({ loading: true, error: null });

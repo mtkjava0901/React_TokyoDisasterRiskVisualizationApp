@@ -13,7 +13,7 @@ export function toRiskPanelViewModel(
   zoom: number | null | undefined,
   activeLayer?: ActiveLayer
 ): RiskPanelViewModel | null {
-  console.log("API earthquake:", result.earthquake);
+  // console.log("API earthquake:", result.earthquake);
 
   if (!result) return null;
 

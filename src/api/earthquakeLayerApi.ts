@@ -19,19 +19,19 @@ export const fetchEarthquakeLayer = async (
   maxLat: number,
   minLng: number,
   maxLng: number,
-  meshLevel: number // 0204追加
+  meshLevel: number
 ) => {
-  console.log("API request params:", {
-    minLat,
-    maxLat,
-    minLng,
-    maxLng,
-    meshLevel
-  }); // 0204追加
+  // console.log("API request params:", {
+  //   minLat,
+  //   maxLat,
+  //   minLng,
+  //   maxLng,
+  //   meshLevel
+  // });
 
   const res = await axios.get("http://localhost:8080/api/earthquake/layer", {
     params: { minLat, maxLat, minLng, maxLng, meshLevel }
   });
 
-  return res.data; // 0204追加
+  return res.data;
 };

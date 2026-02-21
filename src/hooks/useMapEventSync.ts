@@ -36,12 +36,13 @@ export default function useMapEventSync({ mapRef }: UseMapEventSyncProps) {
   const setTrigger = useSetAtom(locationTriggerAtom);
   const location = useAtomValue(locationAtom);
 
-  console.log("MapEventSync locationAtom", locationAtom);
+  // デバッグ用
+  // console.log("MapEventSync locationAtom", locationAtom);
 
   // location監視ログ
-  useEffect(() => {
-    console.log("📍 locationAtom changed:", location);
-  }, [location]);
+  // useEffect(() => {
+  //   console.log("📍 locationAtom changed:", location);
+  // }, [location]);
 
   // MAP状態確定時
   const onIdle = useCallback(() => {
@@ -73,7 +74,6 @@ export default function useMapEventSync({ mapRef }: UseMapEventSyncProps) {
       !location || location.lat !== lat || location.lng !== lng;
 
     if (locationChanged) {
-      console.log("MAP_CLICK fired", { lat, lng });
       setLocation({ lat, lng });
       setTrigger("MAP_CLICK");
     }
@@ -107,14 +107,3 @@ export default function useMapEventSync({ mapRef }: UseMapEventSyncProps) {
   // GoogleMapに渡すイベントハンドラ
   return { onIdle };
 }
-
-/**---------------------------------------------
- * 全体の流れ
- * 1.ユーザーが地図操作
- * 2.GoogleMap onIdle発火
- * 3.MapEventSync.onIdle実行
- * 4.Map状態を取得
- * 5.差分があればatom更新
- * 6.必要なControllerが反応(API取得など)
- * 7.Overlayが再描画
- ---------------------------------------------*/

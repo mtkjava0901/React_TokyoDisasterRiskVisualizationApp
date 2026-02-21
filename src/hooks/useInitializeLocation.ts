@@ -19,7 +19,8 @@ export function useInitializeLocation() {
       lng: 139.753634
     };
 
-    console.log("🚀 initialize location", initial);
+    // デバッグ用
+    // console.log("initialize location", initial);
 
     setLocation(initial);
     setTrigger("MAP_CLICK");
