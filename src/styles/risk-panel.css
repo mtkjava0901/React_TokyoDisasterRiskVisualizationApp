@@ -140,7 +140,8 @@
 
 .risk-flood-high {
   color: white;
-  background: #0d47a1; /* 濃い青 */
+  background: #0d47a1;
+  /* 濃い青 */
   padding: 3px 10px;
   border-radius: 6px;
   font-weight: 700;
@@ -148,7 +149,8 @@
 
 .risk-flood-medium {
   color: white;
-  background: #1976d2; /* 中青 */
+  background: #1976d2;
+  /* 中青 */
   padding: 3px 10px;
   border-radius: 6px;
   font-weight: 700;
@@ -156,10 +158,21 @@
 
 .risk-flood-low {
   color: white;
-  background: #64b5f6; /* 薄青 */
+  background: #64b5f6;
+  /* 薄青 */
   padding: 3px 10px;
   border-radius: 6px;
   font-weight: 700;
+}
+
+.risk-flood-none {
+  color: #666;
+  background: #e2e8f0;
+  /* グレー */
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  border: 1px solid #cbd5e1;
 }
 
 /* -------------------------

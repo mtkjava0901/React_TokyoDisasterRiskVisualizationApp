@@ -47,18 +47,22 @@ function toFloodViewModel(
   result: any,
   zoom: number | null | undefined
 ): RiskPanelViewModel {
+  // バックエンドからのレスポンスがない(null/undefined) または UNKNOWN の場合は「NONE(安全)」として扱う
+  const isNone = !result.flood || result.flood === "UNKNOWN" || result.flood === "NONE";
+  const finalRiskLevel = isNone ? "NONE" : result.flood;
+
   return {
     disasterType: "FLOOD",
 
-    riskLevel: result.flood ?? null,
-    riskLevelLabel: floodRiskLevelToLabel(result.flood),
+    riskLevel: finalRiskLevel,
+    riskLevelLabel: floodRiskLevelToLabel(finalRiskLevel),
 
     address: formatAddress(result.address),
 
     zoomLabel: zoomToScaleLabel(zoom),
 
     // 洪水用: 浸水深説明
-    hazardValue: result.floodDepthDescription ?? "－",
+    hazardValue: isNone ? "浸水想定なし" : (result.floodDepthDescription ?? "－"),
 
     updatedAt: result.floodUpdatedAt
   };
@@ -77,6 +81,8 @@ function floodRiskLevelToLabel(level: string | null | undefined): string {
       return "浸水リスク中";
     case "LOW":
       return "浸水リスク低";
+    case "NONE":
+      return "対象外";
     default:
       return "－";
   }

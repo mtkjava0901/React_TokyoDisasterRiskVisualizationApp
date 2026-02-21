@@ -11,7 +11,8 @@ export default function CrossHairUI() {
   if (isReadMeOpen) return null;
   return (
     <div className="crosshair-root">
-      <div className="crosshair" />
+      {/* 案3: Googleマップ風の中心ピン（ドロップピン型） */}
+      <div className="crosshair-proposal-3" />
     </div>
   );
 }

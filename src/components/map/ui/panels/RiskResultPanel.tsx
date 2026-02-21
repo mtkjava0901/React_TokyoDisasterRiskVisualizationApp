@@ -41,7 +41,7 @@ export default function RiskResultPanel() {
           ? "想定地震：都心南部直下地震"
           : "想定洪水：想定最大規模による洪水"}
       </div>
-      <div className="risk-panel-title">選択地点の災害リスク</div>
+      <div className="risk-panel-title" style={{ textAlign: "center" }}>選択地点の災害リスク</div>
       {/* Loading */}
       {ui.loading && <div className="risk-panel-message">取得中...</div>}
       {/* error */}

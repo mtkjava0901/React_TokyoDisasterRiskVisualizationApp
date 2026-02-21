@@ -4,7 +4,7 @@ import { LatLng } from "./Earthquake";
  * 洪水の型定義
  * フロント全体で再利用可能なクラス
  ------------------------------------------------------------------ */
-export type FloodRiskLevel = "HIGH" | "MEDIUM" | "LOW";
+export type FloodRiskLevel = "HIGH" | "MEDIUM" | "LOW" | "NONE";
 
 export type FloodLayerResponse = {
   polygon: { lat: number; lng: number }[];

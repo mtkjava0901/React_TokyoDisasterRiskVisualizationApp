@@ -33,6 +33,7 @@ export default function ReadMeModal({ isOpen, onClose }: ReadMeModalProps) {
           <div className="accordion-section">
             <h4>レイヤー共通</h4>
             <ul>
+              <li>地震･洪水レイヤーの同時表示非対応</li>
               <li>矩形メッシュ：約1km × 1km(地震･洪水共通)</li>
               <li>表示範囲：関東･首都圏広域～丁目・街区レベル</li>
             </ul>
@@ -47,8 +48,12 @@ export default function ReadMeModal({ isOpen, onClose }: ReadMeModalProps) {
           <div className="accordion-section">
             <h4>洪水ボタン</h4>
             <ul>
-              <li>想定災害：想定最大規模による洪水</li>
-              <li>(地域で起こり得る最大クラスの豪雨：概ね1000年に1回程度)</li>
+              <li>
+                想定災害：想定最大規模による洪水
+                <div style={{ fontSize: "0.9em", color: "#666", marginTop: "4px" }}>
+                  (地域で起こり得る最大クラスの豪雨：概ね1000年に1回程度)
+                </div>
+              </li>
             </ul>
           </div>
           <div className="accordion-section">
@@ -69,7 +74,7 @@ export default function ReadMeModal({ isOpen, onClose }: ReadMeModalProps) {
       content: (
         <ul>
           <li>[地震][洪水][地図]ボタンで表示切替</li>
-          <li>中央のクロスヘア指定位置データを右上パネルに表示</li>
+          <li>中央のピン指定位置データを右上パネルに表示</li>
           <li>レイヤーの濃淡でリスク段階を表現(3段階)</li>
           <li>地図は拡大･縮小･移動が可能</li>
           <li>住所検索機能･現在地検索機能で指定位置へ移動可能</li>
@@ -91,7 +96,7 @@ export default function ReadMeModal({ isOpen, onClose }: ReadMeModalProps) {
             <p>利用データ：計測震度50mメッシュ別_都心南部直下地震</p>
             <p>クリエイティブ・コモンズ 表示 4.0 国際（CC BY 4.0）</p>
             <a
-              href="https://catalog.data.metro.tokyo.lg.jp/dataset/cf6ba556-86c-4e17-84fe-804198af7b29/resource/0cffb515-4f55-4467-8588-67acc0f30be4"
+              href="https://catalog.data.metro.tokyo.lg.jp/dataset/cf6ba556-f86c-4e17-84fe-804198af7b29/resource/0cffb515-4f55-4467-8588-67acc0f30be4"
               target="_blank"
               rel="noopener noreferrer"
             >

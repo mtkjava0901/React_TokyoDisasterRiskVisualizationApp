@@ -39,5 +39,13 @@ export const floodPolygonStyleMap: Record<
     strokeColor: "#6699AA",
     strokeOpacity: 0.5,
     strokeWeight: 1
+  },
+  NONE: {
+    // fillColor: "#E2E8F0", // 薄いグレーブルー系
+    fillColor: "#CCCCCC",
+    fillOpacity: 0.3,     // 軽く色をつける
+    strokeColor: "#CCCCCC",
+    strokeOpacity: 0.5,
+    strokeWeight: 0.5
   }
 };

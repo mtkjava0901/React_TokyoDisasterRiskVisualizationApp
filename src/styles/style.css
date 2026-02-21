@@ -37,7 +37,8 @@ body,
   position: absolute;
   top: 50%;
   left: 50%;
-  pointer-events: none; /* map操作を邪魔しない */
+  pointer-events: none;
+  /* map操作を邪魔しない */
   transform: translate(-50%, -50%);
   z-index: 1000;
 }
@@ -71,4 +72,113 @@ body,
   height: 2px;
   background: #ff2d55;
   transform: translateY(-50%);
+}
+
+
+/* =======================================
+   Crosshair 提案デザイン案
+======================================= */
+
+/* 案1: 白フチ付きの黒十字（視認性最強） */
+.crosshair-proposal-1 {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  /* 影で白いフチを作る */
+  filter: drop-shadow(0px 0px 1px rgba(255, 255, 255, 1)) drop-shadow(0px 0px 2px rgba(255, 255, 255, 1));
+}
+
+.crosshair-proposal-1::before,
+.crosshair-proposal-1::after {
+  content: "";
+  position: absolute;
+  background: #000;
+  /* 黒線 */
+}
+
+.crosshair-proposal-1::before {
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+.crosshair-proposal-1::after {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+/* 案2: 反転色（Invert）フィルターの適用 */
+.crosshair-proposal-2 {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  /* 下地の色を完璧に反転させる */
+  mix-blend-mode: difference;
+}
+
+.crosshair-proposal-2::before,
+.crosshair-proposal-2::after {
+  content: "";
+  position: absolute;
+  background: #fff;
+  /* differenceで反転させるため白を指定 */
+}
+
+.crosshair-proposal-2::before {
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+.crosshair-proposal-2::after {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+/* 案3: Googleマップ風の中心ピン（ドロップピン型） */
+.crosshair-proposal-3 {
+  width: 32px;
+  height: 32px;
+  position: relative;
+  /* 下端が中心にくるように translateYを調整する */
+  transform: translateY(-50%);
+}
+
+.crosshair-proposal-3::before {
+  /* ピンのアイコンをSVG等で表現、ここではシンプルなCSS図形 */
+  content: "";
+  position: absolute;
+  bottom: 0;
+  /* 下端を0に */
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background-color: #333;
+  border: 2px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  transform: translateX(-50%) rotate(-45deg);
+  box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.crosshair-proposal-3::after {
+  /* ピンの穴 */
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background-color: #fff;
+  border-radius: 50%;
+  transform: translateX(-50%);
 }

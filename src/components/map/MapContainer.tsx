@@ -43,7 +43,7 @@ const LIBRARIES: "geometry"[] = ["geometry"];
  * ・地図操作ロジック
  * ・Risk処理
  *
- --------------------------------------------------------------------*/
+ * --------------------------------------------------------------------*/
 export default function MapContainer() {
   // GoogleMapsAPIロード
   const { isLoaded } = useJsApiLoader({
