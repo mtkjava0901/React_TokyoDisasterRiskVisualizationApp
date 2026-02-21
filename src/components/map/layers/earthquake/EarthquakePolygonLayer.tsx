@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import { Polygon } from "@react-google-maps/api";
 import { earthquakeDataAtom } from "../../../../atoms/earthquakeDataAtom";
 import { earthquakePolygonStyleMap } from "./earthquakeStyle";
-import { mapZoomAtom } from "../../../../atoms/mapAtom";
+import { mapZoomAtom, mapCenterAtom } from "../../../../atoms/mapAtom";
 import { mapBoundsAtom } from "../../../../atoms/mapBoundsAtom";
 import { activeLayerAtom } from "../../../../atoms/activeLayerAtom";
 
@@ -24,6 +24,7 @@ const MAX_POLYGON_COUNT = 3000;
 function EarthquakePolygonLayer() {
   const earthquakes = useAtomValue(earthquakeDataAtom);
   const zoom = useAtomValue(mapZoomAtom);
+  const center = useAtomValue(mapCenterAtom);
   const bounds = useAtomValue(mapBoundsAtom);
   const activeLayer = useAtomValue(activeLayerAtom);
   /**---------------------------------------------
@@ -52,6 +53,13 @@ function EarthquakePolygonLayer() {
       );
       return null;
     }
+
+    console.log(
+      `[EarthquakePolygonLayer] Center [lat: ${center.lat.toFixed(
+        4
+      )}, lng: ${center.lng.toFixed(4)}], Polygons: ${filtered.length}`
+    );
+
     return filtered.map((eq) => (
       <Polygon
         key={eq.meshCode}
@@ -60,7 +68,7 @@ function EarthquakePolygonLayer() {
       />
     ));
     // --- 修正箇所：依存配列に activeLayer と zoom を追加 ---
-  }, [earthquakes, bounds, activeLayer, zoom]);
+  }, [earthquakes, bounds, activeLayer, zoom, center]);
   // -----------------------------------------------------
   return <>{polygons}</>;
 }

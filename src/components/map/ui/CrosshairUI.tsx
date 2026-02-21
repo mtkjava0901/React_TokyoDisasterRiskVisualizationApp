@@ -15,12 +15,3 @@ export default function CrossHairUI() {
     </div>
   );
 }
-
-/*******************************************************************************/
-//  export default function CrossHairUI() {
-//   return (
-//     <div className="crosshair-root">
-//       <div className="crosshair" />
-//     </div>
-//   );
-// }

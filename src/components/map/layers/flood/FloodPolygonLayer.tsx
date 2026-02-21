@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import { Polygon } from "@react-google-maps/api";
 import { floodDataAtom } from "../../../../atoms/floodDataAtom";
 import { floodPolygonStyleMap } from "./floodStyle";
-import { mapZoomAtom } from "../../../../atoms/mapAtom";
+import { mapZoomAtom, mapCenterAtom } from "../../../../atoms/mapAtom";
 import { mapBoundsAtom } from "../../../../atoms/mapBoundsAtom";
 import { activeLayerAtom } from "../../../../atoms/activeLayerAtom";
 
@@ -29,6 +29,7 @@ const MAX_POLYGON_COUNT = 5000;
 function FloodPolygonLayer() {
   const floods = useAtomValue(floodDataAtom);
   const zoom = useAtomValue(mapZoomAtom);
+  const center = useAtomValue(mapCenterAtom);
   const bounds = useAtomValue(mapBoundsAtom);
   const activeLayer = useAtomValue(activeLayerAtom);
 
@@ -84,7 +85,11 @@ function FloodPolygonLayer() {
 
     // Polygon数検証用
     console.log(
-      `[FloodPolygonLayer] zoom:${zoom}, total:${floods.length}, filtered:${filtered.length}/${MAX_POLYGON_COUNT}`
+      `[FloodPolygonLayer] Center [lat: ${center.lat.toFixed(
+        4
+      )}, lng: ${center.lng.toFixed(
+        4
+      )}], zoom:${zoom}, total:${floods.length}, filtered:${filtered.length}/${MAX_POLYGON_COUNT}`
     );
 
     const safe = filtered.slice(0, MAX_POLYGON_COUNT);
@@ -96,7 +101,7 @@ function FloodPolygonLayer() {
         options={floodPolygonStyleMap[f.riskLevel]}
       />
     ));
-  }, [floods, bounds, activeLayer, zoom]);
+  }, [floods, bounds, activeLayer, zoom, center]);
 
   // 2/20
   //   // zoom別 描画数制限
