@@ -1,0 +1,193 @@
+/* 背景のオーバーレイ */
+.readme-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-in-out;
+}
+/* モーダル本体 */
+.readme-modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+/* ヘッダー部分 */
+.readme-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+.readme-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+.close-button:hover {
+  color: #dc143c;
+}
+/* 横スワイプ対応タブリスト */
+.readme-tabs-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e0e0e0;
+  scrollbar-width: none; /* Firefox */
+}
+.readme-tabs-container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+.readme-tab {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #777;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+  min-width: 100px;
+}
+.readme-tab:hover {
+  color: #333;
+  background: #f0f0f0;
+}
+.readme-tab.active {
+  color: #1976d2;
+  border-bottom-color: #1976d2;
+  font-weight: bold;
+}
+.tab-icon {
+  font-size: 20px;
+}
+.tab-title {
+  font-size: 12px;
+  white-space: nowrap;
+}
+/* タブコンテンツエリア */
+.readme-tab-content {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+.content-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+.warning-icon {
+  color: #ff9900;
+}
+.content-body p {
+  line-height: 1.6;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #444;
+}
+.content-body ul {
+  padding-left: 20px;
+  margin-bottom: 16px;
+}
+.content-body li {
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.warning-text {
+  color: #dc143c !important;
+  font-weight: 600;
+}
+/* アコーディオン風セクション */
+.accordion-section {
+  background: #fcfcfc;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+.accordion-section h4 {
+  margin: 0 0 8px 0;
+  color: #1976d2;
+  font-size: 14px;
+}
+.accordion-section ul {
+  margin-bottom: 0;
+}
+/* 出典リスト */
+.source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.source-item {
+  background: #f5f7fa;
+  padding: 12px;
+  border-left: 4px solid #1976d2;
+  border-radius: 4px;
+}
+.source-item h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #333;
+}
+.source-item p {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  color: #666;
+}
+.source-item a {
+  font-size: 13px;
+  color: #1976d2;
+  text-decoration: none;
+}
+.source-item a:hover {
+  text-decoration: underline;
+}

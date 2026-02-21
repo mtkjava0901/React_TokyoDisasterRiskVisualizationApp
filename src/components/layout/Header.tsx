@@ -1,10 +1,12 @@
 import { useAtom } from "jotai";
 import { activeLayerAtom } from "../../atoms/activeLayerAtom";
+import { isReadMeOpenAtom } from "../../atoms/readMeAtom";
 
 import "../../styles/header.css";
 import "../../styles/style.css";
 import { useState } from "react";
 import { useLocationController } from "@/hooks/location/useLocationController";
+import ReadMeModal from "./ReadMeModal";
 
 /**-------------------------
  * Headerパーツ
@@ -17,6 +19,9 @@ import { useLocationController } from "@/hooks/location/useLocationController";
  -------------------------*/
 export default function Header() {
   const [activeLayer, setActiveLayer] = useAtom(activeLayerAtom);
+
+  // モーダルの開閉状態
+  const [isReadMeOpen, setIsReadMeOpen] = useAtom(isReadMeOpenAtom);
 
   // 住所入力
   const [address, setAddress] = useState("");
@@ -59,55 +64,70 @@ export default function Header() {
     }
   };
 
+  // 本体
   return (
-    <header className="header">
-      {/* 左 */}
-      <div className="header-left">
-        <input
-          className="search-input"
-          placeholder="住所・駅名・地名を入力"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          onKeyDown={handlekeyDown}
-        />
+    <>
+      <header className="header">
+        {/* 左 */}
+        <div className="header-left">
+          <input
+            className="search-input"
+            placeholder="住所・駅名・地名を入力"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            onKeyDown={handlekeyDown}
+          />
 
-        <button
-          className="icon-button"
-          title="現在地"
-          onClick={moveToCurrentLocation}
-        >
-          <i className="bi bi-geo-alt-fill" />
-        </button>
-      </div>
+          <button
+            className="icon-button"
+            title="現在地"
+            onClick={moveToCurrentLocation}
+          >
+            <i className="bi bi-geo-alt-fill" />
+          </button>
+        </div>
 
-      {/* 中央 */}
-      <div className="header-center">東京都災害リスク可視化アプリ</div>
+        {/* 中央 */}
+        <div className="header-center">東京都災害リスク可視化アプリ</div>
 
-      {/* 右: [地図][地震][洪水][ReadMe] */}
-      <div className="header-right">
-        <button
-          className={`layer-button ${activeLayer === "map" ? "active" : ""}`}
-          onClick={handleMapLayer}
-        >
-          地図
-        </button>
+        {/* 右: [地図][地震][洪水][ReadMe] */}
+        <div className="header-right">
+          <button
+            className={`layer-button ${activeLayer === "map" ? "active" : ""}`}
+            onClick={handleMapLayer}
+          >
+            地図
+          </button>
 
-        <button
-          className={`layer-button ${activeLayer === "earthquake" ? "active" : ""}`}
-          onClick={handleEarthquake}
-        >
-          地震
-        </button>
+          <button
+            className={`layer-button ${activeLayer === "earthquake" ? "active" : ""}`}
+            onClick={handleEarthquake}
+          >
+            地震
+          </button>
 
-        <button
-          className={`layer-button ${activeLayer === "flood" ? "active" : ""}`}
-          onClick={handleFlood}
-        >
-          洪水
-        </button>
+          <button
+            className={`layer-button ${activeLayer === "flood" ? "active" : ""}`}
+            onClick={handleFlood}
+          >
+            洪水
+          </button>
 
-        <button className="readme-button">ReadMe</button>
-      </div>
-    </header>
+          {/* <button className="readme-button">ReadMe</button> */}
+          <button
+            className="readme-button"
+            onClick={() => setIsReadMeOpen(true)}
+          >
+            ReadMe
+          </button>
+        </div>
+      </header>
+
+      {/* ↓ ヘッダーの外側 (兄弟要素) としてモーダルを配置 */}
+      <ReadMeModal
+        isOpen={isReadMeOpen}
+        onClose={() => setIsReadMeOpen(false)}
+      />
+    </>
   );
 }
