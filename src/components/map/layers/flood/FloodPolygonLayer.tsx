@@ -19,10 +19,10 @@ import { activeLayerAtom } from "../../../../atoms/activeLayerAtom";
  * ・polygon走査ゼロ
  * ・超軽量描画
  ---------------------------------------------*/
-// zoom9未満では洪水レイヤーは非表示
-const DETAIL_RENDER_ZOOM = 9;
-// 最大描画zoom(14以上非表示)
-const MAX_RENDER_ZOOM = 14;
+// zoom8未満では洪水レイヤーは非表示
+const DETAIL_RENDER_ZOOM = 8;
+// 最大描画zoom(17以上非表示)
+const MAX_RENDER_ZOOM = 16;
 // 描画上限設定（パフォーマンスガード）
 const MAX_POLYGON_COUNT = 5000;
 
@@ -85,11 +85,10 @@ function FloodPolygonLayer() {
 
     // Polygon数検証用
     console.log(
-      `[FloodPolygonLayer] Center [lat: ${center.lat.toFixed(
+      `[FloodPolygonLayer] Zoom: ${zoom}, Center: [${center.lat.toFixed(
         4
-      )}, lng: ${center.lng.toFixed(
-        4
-      )}], zoom:${zoom}, total:${floods.length}, filtered:${filtered.length}/${MAX_POLYGON_COUNT}`
+      )}, ${center.lng.toFixed(4)}], Polygons (Filtered/Total): ${filtered.length
+      }/${floods.length}`
     );
 
     const safe = filtered.slice(0, MAX_POLYGON_COUNT);

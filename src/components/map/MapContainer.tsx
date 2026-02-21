@@ -96,14 +96,6 @@ export default function MapContainer() {
         }}
         onClick={handleMapClick}
         {...mapEvents}
-        onIdle={() => {
-          if (mapRef.current) {
-            console.log("現在のズーム値:", mapRef.current.getZoom());
-          }
-          if (mapEvents.onIdle) {
-            mapEvents.onIdle();
-          }
-        }}
       >
         <EarthquakePolygonLayer />
         <FloodPolygonLayer />

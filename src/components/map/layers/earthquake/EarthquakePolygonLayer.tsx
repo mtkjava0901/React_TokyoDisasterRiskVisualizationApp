@@ -14,10 +14,10 @@ import { activeLayerAtom } from "../../../../atoms/activeLayerAtom";
  * ・描画だけに集中
  * ・再レンダリング最小化
  ---------------------------------------------*/
-// zoom9未満では地震レイヤーは非表示
+// zoom8未満では地震レイヤーは非表示
 const DETAIL_RENDER_ZOOM = 9;
-// 最大描画zoom(14以上非表示)
-const MAX_RENDER_ZOOM = 13;
+// 最大描画zoom(17以上非表示)
+const MAX_RENDER_ZOOM = 16;
 // 描画上限設定（パフォーマンスガード）
 const MAX_POLYGON_COUNT = 3000;
 
@@ -54,10 +54,12 @@ function EarthquakePolygonLayer() {
       return null;
     }
 
+    // 検証用ログ出力（zoom、Polygon数、中心座標）
     console.log(
-      `[EarthquakePolygonLayer] Center [lat: ${center.lat.toFixed(
+      `[EarthquakePolygonLayer] Zoom: ${zoom}, Center: [${center.lat.toFixed(
         4
-      )}, lng: ${center.lng.toFixed(4)}], Polygons: ${filtered.length}`
+      )}, ${center.lng.toFixed(4)}], Polygons (Filtered/Total): ${filtered.length
+      }/${earthquakes.length}`
     );
 
     return filtered.map((eq) => (
@@ -67,7 +69,7 @@ function EarthquakePolygonLayer() {
         options={earthquakePolygonStyleMap[eq.riskLevel]}
       />
     ));
-    // --- 修正箇所：依存配列に activeLayer と zoom を追加 ---
+    // --- 修正箇所：依存配列に activeLayer、zoom、center を追加 ---
   }, [earthquakes, bounds, activeLayer, zoom, center]);
   // -----------------------------------------------------
   return <>{polygons}</>;
