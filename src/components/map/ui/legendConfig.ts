@@ -16,7 +16,8 @@ export const LEGEND_CONFIG = {
     items: [
       { key: "high", label: "浸水深が深い", color: "#0000FF" },
       { key: "medium", label: "浸水深が中程度", color: "#0099FF" },
-      { key: "low", label: "浸水深が浅い", color: "#66CCFF" }
+      { key: "low", label: "浸水深が浅い", color: "#66CCFF" },
+      { key: "none", label: "対象外", color: "#CCCCCC" }
     ]
   }
 } as const;
