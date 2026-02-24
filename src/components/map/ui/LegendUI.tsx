@@ -30,6 +30,10 @@ export default function LegendUI() {
           </li>
         ))}
       </ul>
+
+      {config.zoomRange && (
+        <div className="legend-zoom">{config.zoomRange}</div>
+      )}
     </div>
   );
 }
