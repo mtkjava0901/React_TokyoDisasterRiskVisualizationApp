@@ -15,10 +15,7 @@ export type PolygonStyle = {
   strokeWeight: number;
 };
 
-export const floodPolygonStyleMap: Record<
-  FloodRiskLevel,
-  PolygonStyle
-> = {
+export const floodPolygonStyleMap: Record<FloodRiskLevel, PolygonStyle> = {
   HIGH: {
     fillColor: "#0000FF",
     fillOpacity: 0.5,
@@ -41,9 +38,8 @@ export const floodPolygonStyleMap: Record<
     strokeWeight: 1
   },
   NONE: {
-    // fillColor: "#E2E8F0", // 薄いグレーブルー系
     fillColor: "#CCCCCC",
-    fillOpacity: 0.3,     // 軽く色をつける
+    fillOpacity: 0.3,
     strokeColor: "#CCCCCC",
     strokeOpacity: 0.5,
     strokeWeight: 0.5

@@ -8,7 +8,7 @@ export const LEGEND_CONFIG = {
     // 2/24追加
     zoomRange: "表示ズーム：8～16",
     items: [
-      { key: "high", label: "揺れやすい", color: "#FF0000" },
+      { key: "high", label: "揺れやすい", color: "#dc143c" },
       { key: "medium", label: "やや揺れやすい", color: "#FF9900" },
       { key: "low", label: "比較的揺れにくい", color: "#FFFF00" }
     ]

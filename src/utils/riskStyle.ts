@@ -16,19 +16,3 @@ export function getRiskClass(
   // default = 地震
   return `risk-earthquake-${level}`;
 }
-
-/*************************************************************/
-// export function getRiskClass(level: string | null | undefined) {
-//   if (!level) return "";
-
-//   switch (level) {
-//     case "HIGH":
-//       return "risk-high";
-//     case "MEDIUM":
-//       return "risk-medium";
-//     case "LOW":
-//       return "risk-low";
-//     default:
-//       return "";
-//   }
-// }

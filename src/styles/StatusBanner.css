@@ -34,24 +34,3 @@
   background: #721c24;
   color: white;
 }
-
-/* 旧 */
-/* .tokyo-banner {
-  position: fixed;
-  top: 55px;
-  left: 0;
-  right: 0;
-
-  height: 30px;
-  background: #dc143c;
-  color: white;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  z-index: 1000;
-} */

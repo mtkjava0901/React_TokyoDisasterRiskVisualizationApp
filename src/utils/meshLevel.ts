@@ -1,4 +1,4 @@
-import { MeshLevel } from "../types/meshLevel";
+import { MeshLevel } from "../types/MeshLevel";
 
 export function getMeshLevelByZoom(zoom: number): MeshLevel {
   if (zoom <= 9) {

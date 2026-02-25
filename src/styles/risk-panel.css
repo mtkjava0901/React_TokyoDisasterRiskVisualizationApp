@@ -174,31 +174,3 @@
   font-weight: 700;
   border: 1px solid #cbd5e1;
 }
-
-/* -------------------------
-   リスク色（バッジ表示）(2/20未使用)
-------------------------- */
-
-/* .risk-high {
-  color: white;
-  background: #dc143c;
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-weight: 700;
-}
-
-.risk-medium {
-  color: white;
-  background: #ff9900;
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-weight: 700;
-}
-
-.risk-low {
-  color: white;
-  background: #2e7d32;
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-weight: 700;
-} */
