@@ -38,10 +38,6 @@ export const fetchFloodLayer = async (
     }
   );
 
-  // const res = await axios.get("http://localhost:8080/api/flood/layer", {
-  //   params: { minLat, maxLat, minLng, maxLng }
-  // });
-
   // polygon ⇒ bbox変換
   return res.data.map((item) => ({
     ...item,

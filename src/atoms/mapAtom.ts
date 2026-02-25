@@ -15,5 +15,5 @@ export const mapCenterAtom = atom<MapCenter>({
   lng: 139.6917
 });
 
-// ズームレベルのatom（10=初期値）
+// ズームレベルのatom(初期値)
 export const mapZoomAtom = atom<number>(11);

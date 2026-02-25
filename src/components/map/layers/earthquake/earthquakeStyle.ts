@@ -19,7 +19,7 @@ export const earthquakePolygonStyleMap: Record<
   PolygonStyle
 > = {
   HIGH: {
-    fillColor: "#FF0000",
+    fillColor: "#dc143c",
     fillOpacity: 0.5,
     strokeColor: "#AA0000",
     strokeOpacity: 0.7,
