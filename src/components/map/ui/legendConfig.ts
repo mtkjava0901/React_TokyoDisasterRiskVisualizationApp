@@ -5,8 +5,7 @@
 export const LEGEND_CONFIG = {
   earthquake: {
     title: "震度",
-    // 2/24追加
-    zoomRange: "表示ズーム：8～16",
+    zoomRange: "表示ズーム：首都圏～街区",
     items: [
       { key: "high", label: "揺れやすい", color: "#dc143c" },
       { key: "medium", label: "やや揺れやすい", color: "#FF9900" },
@@ -15,8 +14,7 @@ export const LEGEND_CONFIG = {
   },
   flood: {
     title: "浸水リスク",
-    // 2/24追加
-    zoomRange: "表示ズーム：8～16",
+    zoomRange: "表示ズーム：首都圏～街区",
     items: [
       { key: "high", label: "浸水深が深い", color: "#0000FF" },
       { key: "medium", label: "浸水深が中程度", color: "#0099FF" },
