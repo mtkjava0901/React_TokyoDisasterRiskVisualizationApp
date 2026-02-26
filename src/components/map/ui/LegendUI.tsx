@@ -2,6 +2,7 @@ import "@styles/LegendUI.css";
 import { useAtomValue } from "jotai";
 import { activeLayerAtom } from "@/atoms/activeLayerAtom";
 import { LEGEND_CONFIG } from "@/components/map/ui/legendConfig";
+import { areaModeAtom } from "@/atoms/areaModeAtom";
 
 /**----------------------------------------
  * 汎用UIコンポーネント
@@ -9,8 +10,13 @@ import { LEGEND_CONFIG } from "@/components/map/ui/legendConfig";
  ----------------------------------------*/
 export default function LegendUI() {
   const activeLayer = useAtomValue(activeLayerAtom);
+  // 2/26修正版
+  const areaMode = useAtomValue(areaModeAtom);
 
   if (activeLayer === "map") return null;
+
+  // 2/26追加版
+  if (areaMode === "OUTSIDE_TOKYO") return null;
 
   const config = LEGEND_CONFIG[activeLayer];
   if (!config) return null;
