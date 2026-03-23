@@ -1,3 +1,4 @@
+import apiClient from "@/libs/apiClient";
 import axios from "axios";
 
 /**-------------------------------
@@ -16,7 +17,8 @@ export const fetchNearestBoundary = async (
   lat: number,
   lng: number
 ): Promise<NearestBoundaryResponse> => {
-  const res = await axios.get("/api/area/tokyo/nearest-boundary", {
+  // const res = await axios.get("/api/area/tokyo/nearest-boundary", {
+  const res = await apiClient.get("/api/area/tokyo/nearest-boundary", {
     params: { lat, lng }
   });
 

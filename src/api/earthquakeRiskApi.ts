@@ -23,7 +23,6 @@ export async function fetchEarthquakeRisk(
   lng: number
 ): Promise<EarthquakeRiskResponse | null> {
   try {
-    // const response = await axios.get<EarthquakeRiskResponse>(
     const response = await apiClient.get<EarthquakeRiskResponse>(
       "/api/earthquake/risk",
       { params: { lat, lng } }

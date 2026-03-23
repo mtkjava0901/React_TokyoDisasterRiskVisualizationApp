@@ -1,3 +1,4 @@
+import apiClient from "@/libs/apiClient";
 import axios from "axios";
 
 export type TokyoContainsResponse = {
@@ -11,7 +12,8 @@ export const checkTokyoContains = async (
   lat: number,
   lng: number
 ): Promise<TokyoContainsResponse> => {
-  const res = await axios.get<TokyoContainsResponse>(
+  // const res = await axios.get<TokyoContainsResponse>(
+  const res = await apiClient.get<TokyoContainsResponse>(
     "/api/area/tokyo/contains",
     { params: { lat, lng } }
   );
