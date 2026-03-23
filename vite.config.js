@@ -4,6 +4,7 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  base: "/React_TokyoDisasterRiskVisualizationApp/",
   resolve: {
     alias: {
       "@styles": path.resolve("src/styles"),
