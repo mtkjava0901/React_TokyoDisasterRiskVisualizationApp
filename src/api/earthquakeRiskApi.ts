@@ -1,4 +1,5 @@
-import axios from "axios";
+// import axios from "axios";
+import apiClient from "@/libs/apiClient";
 
 /**---------------------------------------
  * A-03 地震リスク1点判定 API
@@ -22,8 +23,9 @@ export async function fetchEarthquakeRisk(
   lng: number
 ): Promise<EarthquakeRiskResponse | null> {
   try {
-    const response = await axios.get<EarthquakeRiskResponse>(
-      "http://localhost:8080/api/earthquake/risk",
+    // const response = await axios.get<EarthquakeRiskResponse>(
+    const response = await apiClient.get<EarthquakeRiskResponse>(
+      "/api/earthquake/risk",
       { params: { lat, lng } }
     );
 

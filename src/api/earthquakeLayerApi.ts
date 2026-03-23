@@ -1,4 +1,5 @@
-import axios from "axios";
+// import axios from "axios";
+import apiClient from "@/libs/apiClient";
 import { MeshLevel } from "../domain/map/zoomRule";
 
 /**----------------------------------------------
@@ -29,7 +30,8 @@ export const fetchEarthquakeLayer = async (
   //   meshLevel
   // });
 
-  const res = await axios.get("http://localhost:8080/api/earthquake/layer", {
+  // const res = await axios.get("http://localhost:8080/api/earthquake/layer", {
+  const res = await apiClient.get("/api/earthquake/layer", {
     params: { minLat, maxLat, minLng, maxLng, meshLevel }
   });
 

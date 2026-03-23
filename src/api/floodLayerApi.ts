@@ -1,4 +1,5 @@
-import axios from "axios";
+// import axios from "axios";
+import apiClient from "@/libs/apiClient";
 import { calcPolygonBBox } from "../utils/calcPolygonBBox";
 import { FloodLayerResponse } from "../types/Flood";
 
@@ -30,9 +31,9 @@ export const fetchFloodLayer = async (
     maxLng
   });
 
-  // 2/20
-  const res = await axios.get<FloodLayerResponse[]>(
-    "http://localhost:8080/api/flood/layer",
+  // const res = await axios.get<FloodLayerResponse[]>(
+  const res = await apiClient.get<FloodLayerResponse[]>(
+    "/api/flood/layer",
     {
       params: { minLat, maxLat, minLng, maxLng }
     }

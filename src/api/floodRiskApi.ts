@@ -1,4 +1,5 @@
-import axios from "axios";
+// import axios from "axios";
+import apiClient from "@/libs/apiClient";
 
 /**---------------------------------------
  * A-04 洪水リスク1点判定 API
@@ -22,10 +23,10 @@ export async function fetchFloodRisk(
   lng: number
 ): Promise<FloodRiskResponse | null> {
   try {
-    const response = await axios.get<FloodRiskResponse>(
-      "http://localhost:8080/api/flood/risk",
-      { params: { lat, lng } }
-    );
+    // const response = await axios.get<FloodRiskResponse>(
+    const response = await apiClient.get<FloodRiskResponse>("/api/flood/risk", {
+      params: { lat, lng }
+    });
 
     return response.data;
   } catch (error) {
