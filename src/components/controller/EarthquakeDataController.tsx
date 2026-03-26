@@ -6,6 +6,7 @@ import { earthquakeDataAtom } from "../../atoms/earthquakeDataAtom";
 import { activeLayerAtom } from "../../atoms/activeLayerAtom";
 import { MeshLevel, resolveZoomRule } from "../../domain/map/zoomRule";
 import { mapZoomAtom } from "../../atoms/mapAtom";
+import { apiLoadingAtom } from "../../atoms/loadingAtom";
 
 /**--------------------------------------------------------------
  * Earthquakeデータ司令塔
@@ -34,6 +35,7 @@ export default function EarthquakeDataController() {
   const [zoom] = useAtom(mapZoomAtom);
   const [activeLayer] = useAtom(activeLayerAtom);
   const [, setEarthquakes] = useAtom(earthquakeDataAtom);
+  const [, setIsLoading] = useAtom(apiLoadingAtom);
   const lastFetchKeyRef = useRef<string | null>(null);
   const isFetchingRef = useRef(false);
   useEffect(() => {
@@ -68,6 +70,8 @@ export default function EarthquakeDataController() {
     const timer = setTimeout(async () => {
       lastFetchKeyRef.current = fetchKey;
       isFetchingRef.current = true;
+      setIsLoading(true);
+
       try {
         const data = await fetchEarthquakeLayer(
           bounds.minLat,
@@ -82,6 +86,7 @@ export default function EarthquakeDataController() {
         // setEarthquakes([]); // エラー時はクリアしても良い
       } finally {
         isFetchingRef.current = false;
+        setIsLoading(false);
       }
     }, 350);
     return () => clearTimeout(timer);

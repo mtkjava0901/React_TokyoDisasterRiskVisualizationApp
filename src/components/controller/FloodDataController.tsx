@@ -5,6 +5,7 @@ import { mapBoundsAtom } from "../../atoms/mapBoundsAtom";
 import { floodDataAtom } from "../../atoms/floodDataAtom";
 import { activeLayerAtom } from "../../atoms/activeLayerAtom";
 import { mapZoomAtom } from "../../atoms/mapAtom";
+import { apiLoadingAtom } from "../../atoms/loadingAtom";
 
 /**--------------------------------------------------------------
  * Floodデータ司令塔
@@ -26,6 +27,7 @@ export default function FloodDataController() {
   const [zoom] = useAtom(mapZoomAtom);
   const [activeLayer] = useAtom(activeLayerAtom);
   const [, setFloods] = useAtom(floodDataAtom);
+  const [, setIsLoading] = useAtom(apiLoadingAtom);
   const lastFetchKeyRef = useRef<string | null>(null);
   const isFetchingRef = useRef(false);
 
@@ -62,6 +64,7 @@ export default function FloodDataController() {
     const timer = setTimeout(async () => {
       lastFetchKeyRef.current = fetchKey;
       isFetchingRef.current = true;
+      setIsLoading(true);
 
       try {
         const data = await fetchFloodLayer(
@@ -75,6 +78,7 @@ export default function FloodDataController() {
         console.error("[FDC] fetchFloodLayer error", err);
       } finally {
         isFetchingRef.current = false;
+        setIsLoading(false);
       }
     }, 350);
 

@@ -138,7 +138,19 @@ export default function ReadMeModal({ isOpen, onClose }: ReadMeModalProps) {
         <>
           <p>本アプリは東京都による公式アプリではありません。</p>
           <p>本アプリで使用しているデータは最新でない可能性があります。</p>
-          <p className="warning-text">
+          
+          <div className="system-notice" style={{ marginTop: "16px", padding: "12px", backgroundColor: "#f8f9fa", borderRadius: "8px", borderLeft: "4px solid #ffbc00" }}>
+            <h4 style={{ fontSize: "0.95em", marginBottom: "8px", color: "#333", fontWeight: "bold" }}>【初回読み込み時の遅延について】</h4>
+            <p style={{ fontSize: "0.9em", color: "#555", lineHeight: "1.5", margin: 0 }}>
+              本アプリのバックエンドAPIは、RenderのFreeプラン上で動作しているため、<br/>
+              ・初回アクセス時<br/>
+              ・約15分以上アクセスが無かった後の再アクセス時<br/>
+              には、サーバーの起動（コールドスタート）により、地震・洪水メッシュの表示に30秒～数分程度かかる場合があります。<br/>
+              画面がしばらく無反応に見える場合は、そのまましばらくお待ちください。
+            </p>
+          </div>
+
+          <p className="warning-text" style={{ marginTop: "16px" }}>
             防災情報は必ず自治体の公式発表をご確認ください。
           </p>
         </>
